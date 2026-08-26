@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevOps Engineering Fieldbook - Chapter 03 V3.1</title>
+  <link rel="stylesheet" href="../../styles/book.css">
+</head>
+<body>
+  <nav class="screen-nav" aria-label="Book navigation">
+    <span>DevOps Engineering Fieldbook</span>
+    <span>Volume 1 - Linux Systems &amp; Operations</span>
+  </nav>
+  <main class="book-shell">
+    <section class="cover" id="cover">
+      <div class="cover-kicker">STUDY EDITION</div>
+      <h1>DevOps Engineering Fieldbook</h1>
+      <p class="cover-volume">Volume 1</p>
+      <p class="cover-subtitle">Linux Systems &amp; Operations</p>
+      <div class="cover-rule"></div>
+      <p class="cover-audience">Beginner-first operations textbook: problem, model, mechanism, experiment and evidence.</p>
+      <p class="cover-meta">Chapter 03 V3.1 - Golden language applied</p>
+    </section>
+    <section class="front-matter compact-front">
+      <div class="front-grid">
+        <section>
+          <p class="eyebrow">PURPOSE OF THIS CHAPTER</p>
+          <h2>Understand the layer before choosing the command</h2>
+          <p>Each chapter moves from a familiar operations problem to a visual mental model, mechanism, safe experiment, failure/debugging path, DevOps relevance, recall and lab.</p>
+        </section>
+        <section>
+          <p class="eyebrow">HOW TO USE THIS BOOK</p>
+          <h2>Read, run, observe, explain, rebuild</h2>
+          <p>Use a disposable Ubuntu VM with snapshots. Record real output and keep raw evidence before changing state.</p>
+        </section>
+      </div>
+      <div class="legend-strip"><span><b>CORE</b> mechanism</span><span><b>TRY IT</b> safe experiment</span><span><b>TRAP</b> misconception</span><span><b>PRODUCTION</b> operations</span><span><b>STOP &amp; RECALL</b> retrieval</span></div>
+      <div class="study-loop"><p class="eyebrow">THE STUDY LOOP</p><div class="loop-grid"><span>Question</span><b>→</b><span>Example</span><b>→</b><span>Mental model</span><b>→</b><span>Experiment</span><b>→</b><span>Observation</span><b>→</b><span>Rebuild</span></div></div>
+      <div class="roadmap"><p class="eyebrow">VOLUME 1 ROADMAP</p><div class="roadmap-grid"><span><b>Chapter 00</b><br>Linux mental model</span><span><b>Chapter 03</b><br>Search, Transform &amp; Inspect</span><span><b>Next</b><br>Processes, services, networking and recovery</span></div></div>
+    </section>
+    <section class="toc" id="table-of-contents">
+      <p class="eyebrow">CONTENTS</p>
+      <h2>Chapter 03 - Search, Transform &amp; Inspect</h2>
+      <div class="toc-list"><a class="toc-entry" href="#section-3-1-khi-du-lieu-qua-nhieu-e-oc-bang-mat"><span class="toc-label">3.1 Khi dữ liệu quá nhiều để đọc bằng mắt</span><span class="toc-page">3</span></a><a class="toc-entry" href="#section-3-2-inspect-truoc-khi-search"><span class="toc-label">3.2 Inspect trước khi search</span><span class="toc-page">3</span></a><a class="toc-entry" href="#section-3-3-head-va-tail"><span class="toc-label">3.3 head và tail</span><span class="toc-page">4</span></a><a class="toc-entry" href="#section-3-4-grep-tim-matching-lines"><span class="toc-label">3.4 grep - tìm matching lines</span><span class="toc-page">4</span></a><a class="toc-entry" href="#section-3-5-literal-search-truoc-regex"><span class="toc-label">3.5 Literal search trước regex</span><span class="toc-page">4</span></a><a class="toc-entry" href="#section-3-6-grep-options-quan-trong"><span class="toc-label">3.6 grep options quan trọng</span><span class="toc-page">5</span></a><a class="toc-entry" href="#section-3-7-wc-em-evidence"><span class="toc-label">3.7 wc - đếm evidence</span><span class="toc-page">5</span></a><a class="toc-entry" href="#section-3-8-sort-va-uniq"><span class="toc-label">3.8 sort và uniq</span><span class="toc-page">5</span></a><a class="toc-entry" href="#section-3-9-cut-lay-field-on-gian"><span class="toc-label">3.9 cut - lấy field đơn giản</span><span class="toc-page">6</span></a><a class="toc-entry" href="#section-3-10-find-tim-filesystem-objects"><span class="toc-label">3.10 find - tìm filesystem objects</span><span class="toc-page">6</span></a><a class="toc-entry" href="#section-3-11-find-khac-grep-the-nao"><span class="toc-label">3.11 find khác grep thế nào?</span><span class="toc-page">6</span></a><a class="toc-entry" href="#section-3-12-xargs-tu-stdin-sang-command-arguments"><span class="toc-label">3.12 xargs - từ stdin sang command arguments</span><span class="toc-page">7</span></a><a class="toc-entry" href="#section-3-13-pipe-cac-tool-nho-voi-nhau"><span class="toc-label">3.13 Pipe các tool nhỏ với nhau</span><span class="toc-page">8</span></a><a class="toc-entry" href="#section-3-14-preview-awk-va-sed-giai-quyet-bai-toan-gi"><span class="toc-label">3.14 Preview: awk và sed giải quyết bài toán gì?</span><span class="toc-page">8</span></a><a class="toc-entry" href="#section-3-15-failure-modes-va-debugging"><span class="toc-label">3.15 Failure modes và debugging</span><span class="toc-page">8</span></a><a class="toc-entry" href="#section-3-16-stop-recall"><span class="toc-label">3.16 STOP &amp; RECALL</span><span class="toc-page">9</span></a><a class="toc-entry" href="#section-3-17-guided-lab"><span class="toc-label">3.17 Guided Lab</span><span class="toc-page">9</span></a><a class="toc-entry" href="#section-3-18-chapter-checkpoint"><span class="toc-label">3.18 Chapter Checkpoint</span><span class="toc-page">10</span></a></div>
+    </section>
+    <section class="chapter-header" id="chapter-03">
+      <p class="eyebrow">CHAPTER 03</p>
+      <h1>Search, Transform &amp; Inspect</h1>
+      <p class="chapter-dek">Name the layer, observe the state and test one hypothesis at a time.</p>
+      <div class="chapter-tags"><span>CORE</span><span>HANDS-ON</span><span>PRODUCTION</span></div>
+    </section>
+    <article class="chapter-content"><h2 id="section-3-1-khi-du-lieu-qua-nhieu-e-oc-bang-mat">3.1 Khi dữ liệu quá nhiều để đọc bằng mắt</h2><p>Bạn có một file log nhỏ hôm qua. Hôm nay nó có hàng nghìn dòng. Câu hỏi thực tế là: <strong>“Tôi có rất nhiều file/log lines. Làm sao tìm đúng thứ mình cần mà không đọc từng dòng bằng mắt?”</strong></p>
+<p>Ta sẽ không bắt đầu bằng một command dài. Hãy tạo fixture disposable và biết trước nó chứa gì:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">mkdir -p &quot;$HOME/fieldbook-labs/ch03-search&quot;
+cd &quot;$HOME/fieldbook-labs/ch03-search&quot;
+printf &#39;%s\n&#39; \
+  &#39;10:00 api INFO request-start&#39; \
+  &#39;10:01 api ERROR timeout&#39; \
+  &#39;10:02 worker ERROR queue-full&#39; \
+  &#39;10:03 api INFO request-done&#39; \
+  &#39;10:04 api ERROR timeout&#39; \
+  &gt; events.log</code></pre></figure><p>Fixture có 5 lines, hai service (<code class="inline-code">api</code>, <code class="inline-code">worker</code>), hai <code class="inline-code">ERROR</code> lines cho <code class="inline-code">api</code> và một cho <code class="inline-code">worker</code>. Biết trước đáp án giúp ta kiểm tra tool thay vì tin mù quáng vào output.</p>
+<h2 id="section-3-2-inspect-truoc-khi-search">3.2 Inspect trước khi search</h2><p>Trước khi search, xem file có thật và hiểu shape của nó:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">pwd
+ls -l events.log
+wc -l events.log
+head -n 3 events.log
+tail -n 2 events.log</code></pre></figure><p><code class="inline-code">ls</code> kiểm tra object/file name, <code class="inline-code">wc</code> đếm lines, còn <code class="inline-code">head</code> và <code class="inline-code">tail</code> cho sample ở đầu/cuối. Nếu <code class="inline-code">wc</code> nói 0 lines, đừng viết parser phức tạp; hãy kiểm tra input trước.</p>
+<figure class="book-figure diagram-flow" id="fig-03-1">
+  <div class="flow-node accent">raw file / directory tree</div>
+  <div class="flow-arrow">↓ inspect scope and sample</div>
+  <div class="flow-node">matching lines or objects</div>
+  <div class="flow-arrow">↓ select, transform, verify</div>
+  <div class="flow-node strong">evidence-backed result</div>
+  <figcaption>Figure 3.1 - Inspect input trước, rồi search; output đẹp chưa đủ để chứng minh result đúng.</figcaption>
+</figure>
+
+<h2 id="section-3-3-head-va-tail">3.3 head và tail</h2><p>Khi file dài, <code class="inline-code">head</code> xem phần đầu còn <code class="inline-code">tail</code> xem phần cuối:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">head -n 2 events.log
+tail -n 2 events.log</code></pre></figure><p>Đây là experiment về vị trí, không phải search. Trong DevOps, <code class="inline-code">tail -n 20 service.log</code> thường giúp xem những dòng mới nhất; nhưng hãy nhớ đó chỉ là một cửa sổ, không phải toàn bộ log.</p>
+<h2 id="section-3-4-grep-tim-matching-lines">3.4 grep - tìm matching lines</h2><p><code class="inline-code">grep</code> search <strong>content</strong>. Hãy tìm các dòng chứa text <code class="inline-code">ERROR</code>:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">grep -F &#39;ERROR&#39; events.log</code></pre></figure><p><code class="inline-code">grep</code> đọc lines và in những lines match pattern. Với fixture, expected observation là 3 lines. Nếu muốn giữ raw evidence trong file mới, dùng <code class="inline-code">tee</code>:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">grep -F &#39;ERROR&#39; events.log | tee raw-errors.txt</code></pre></figure><p><code class="inline-code">tee</code> vừa cho bạn xem output vừa ghi một bản copy; nó không sửa <code class="inline-code">events.log</code>. Nếu không có line nào, hãy kiểm tra spelling, path, và exit status ngay sau <code class="inline-code">grep</code>.</p>
+<h2 id="section-3-5-literal-search-truoc-regex">3.5 Literal search trước regex</h2><p>Bắt đầu bằng <strong>literal search</strong>: tìm đúng chuỗi ký tự. <code class="inline-code">grep -F &#39;ERROR&#39;</code> không diễn giải <code class="inline-code">.</code> hay <code class="inline-code">*</code> như regex.</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;%s\n&#39; &#39;v1.2 ready&#39; &#39;v1x2 ready&#39; &gt; versions.txt
+grep -F &#39;v1.2&#39; versions.txt
+grep -E &#39;v1.2&#39; versions.txt</code></pre></figure><p><code class="inline-code">grep -E</code> bật extended regular expression; dấu <code class="inline-code">.</code> lúc này có nghĩa “một ký tự bất kỳ”. Vì vậy hai command có thể match số dòng khác nhau. Khi chỉ cần tìm text cố định, <code class="inline-code">-F</code> làm ý định rõ hơn.</p>
+<p>Đừng nhầm regex với shell glob. <code class="inline-code">*.log</code> là shell glob khi shell dùng nó để mở rộng tên file; nó không tự có cùng nghĩa bên trong một pattern regex. Regex thuộc tool như <code class="inline-code">grep -E</code>; glob thuộc shell.</p>
+<h2 id="section-3-6-grep-options-quan-trong">3.6 grep options quan trọng</h2><p>Một vài option đủ dùng cho beginner:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">grep -n -F &#39;ERROR&#39; events.log
+grep -i -F &#39;error&#39; events.log
+grep -v -F &#39;INFO&#39; events.log</code></pre></figure><p><code class="inline-code">-n</code> thêm line number, <code class="inline-code">-i</code> bỏ phân biệt hoa/thường, <code class="inline-code">-v</code> lấy những dòng không match. Hãy thử từng option riêng để quan sát thay đổi. Quoting quan trọng: đặt pattern trong single quotes giúp shell không diễn giải các ký tự pattern trước khi <code class="inline-code">grep</code> nhận chúng.</p>
+<h2 id="section-3-7-wc-em-evidence">3.7 wc - đếm evidence</h2><p>Muốn biết có bao nhiêu matching lines, nối <code class="inline-code">grep</code> với <code class="inline-code">wc</code>:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">grep -F &#39;ERROR&#39; events.log | wc -l</code></pre></figure><p>Expected count là <code class="inline-code">3</code>. <code class="inline-code">wc -l events.log</code> đếm toàn file; <code class="inline-code">grep ... | wc -l</code> đếm output của <code class="inline-code">grep</code>. Hai câu hỏi khác nhau.</p>
+<p>Nếu output là <code class="inline-code">0</code>, đó có thể là no match hợp lệ hoặc input/path sai. Dùng <code class="inline-code">grep -n -F &#39;ERROR&#39; events.log</code> trước khi tin count. Exit status của <code class="inline-code">grep</code> và count do <code class="inline-code">wc</code> in ra là hai evidence khác nhau.</p>
+<h2 id="section-3-8-sort-va-uniq">3.8 sort và uniq</h2><p><code class="inline-code">sort</code> sắp xếp lines. <code class="inline-code">uniq</code> gộp những lines giống nhau <strong>liền kề</strong>, vì thế thường sort trước:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">grep -F &#39;ERROR&#39; events.log | sort
+grep -F &#39;ERROR&#39; events.log | sort | uniq -c</code></pre></figure><p>Hãy nhìn kết quả thật của command thứ hai trước. Vì timestamp nằm trong mỗi dòng, ba dòng sau vẫn là ba <strong>full lines</strong> khác nhau:</p>
+<figure class="code-figure code-output"><div class="code-label">Text example</div><pre><code class="language-text">      1 10:01 api ERROR timeout
+      1 10:02 worker ERROR queue-full
+      1 10:04 api ERROR timeout</code></pre></figure><p><code class="inline-code">uniq</code> chỉ so sánh toàn bộ line với line liền kề. Nó không biết rằng hai dòng <code class="inline-code">api</code> mô tả cùng một loại sự kiện sau khi bỏ timestamp. Muốn summary theo service, trước hết lấy field service ở vị trí thứ hai:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">grep -F &#39;ERROR&#39; events.log \
+  | cut -d&#39; &#39; -f2 \
+  | sort \
+  | uniq -c</code></pre></figure><p>Kết quả lúc này là:</p>
+<figure class="code-figure code-output"><div class="code-label">Text example</div><pre><code class="language-text">      2 api
+      1 worker</code></pre></figure><blockquote>
+<p><strong>[TRAP]</strong> <code class="inline-code">uniq -c</code> không hiểu <strong>semantic event equivalence</strong> (hai dòng có cùng ý nghĩa sự kiện) theo nghĩa của con người. Nó chỉ đếm các full lines giống nhau và liền kề. Hãy chọn field biểu diễn điều bạn muốn đếm, rồi mới <code class="inline-code">sort | uniq -c</code>.</p>
+</blockquote>
+<p>Đừng dùng <code class="inline-code">uniq -c</code> trên input chưa sort rồi kết luận các dòng lặp đã được đếm hết.</p>
+<h2 id="section-3-9-cut-lay-field-on-gian">3.9 cut - lấy field đơn giản</h2><p>Các lines trong fixture có fields cách nhau bằng space: time, service, level, message. <code class="inline-code">cut</code> lấy phần đơn giản khi delimiter rõ:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">cut -d&#39; &#39; -f2 events.log
+grep -F &#39;ERROR&#39; events.log | cut -d&#39; &#39; -f2 | sort | uniq -c</code></pre></figure><p><code class="inline-code">-d&#39; &#39;</code> chọn một space làm delimiter và <code class="inline-code">-f2</code> lấy field thứ hai. Đây là mô hình đơn giản, không phải parser cho mọi log. Nhiều spaces liên tiếp, tabs, hoặc message có format khác có thể làm assumption sai; hãy inspect input trước.</p>
+<h2 id="section-3-10-find-tim-filesystem-objects">3.10 find - tìm filesystem objects</h2><p><code class="inline-code">find</code> search <strong>filesystem objects/paths</strong>, không search nội dung của từng line. Hãy tạo vài file an toàn rồi list:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">mkdir -p logs/archive
+printf &#39;today\n&#39; &gt; logs/app.log
+printf &#39;old\n&#39; &gt; logs/archive/old.log
+printf &#39;temporary\n&#39; &gt; logs/debug.tmp
+find logs -type f -name &#39;*.log&#39; -print</code></pre></figure><p>Expected paths là <code class="inline-code">logs/app.log</code> và <code class="inline-code">logs/archive/old.log</code>. <code class="inline-code">-type f</code> chọn regular files; <code class="inline-code">-name &#39;*.log&#39;</code> chọn filename theo shell-style pattern mà <code class="inline-code">find</code> tự xử lý; <code class="inline-code">-print</code> chỉ list, không mutate.</p>
+<h2 id="section-3-11-find-khac-grep-the-nao">3.11 find khác grep thế nào?</h2><p>Hãy nói thành câu trước khi chọn tool:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Câu hỏi</th>
+<th>Tool</th>
+<th>Nó tìm gì</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Dòng nào chứa <code class="inline-code">ERROR</code>?</td>
+<td><code class="inline-code">grep</code></td>
+<td>content trong text</td>
+</tr>
+<tr>
+<td>File <code class="inline-code">.log</code> nào tồn tại?</td>
+<td><code class="inline-code">find</code></td>
+<td>filesystem objects/paths</td>
+</tr>
+<tr>
+<td>Có bao nhiêu dòng match?</td>
+<td><code class="inline-code">wc</code> sau <code class="inline-code">grep</code></td>
+<td>output lines</td>
+</tr>
+</tbody></table></div>
+<p><code class="inline-code">grep -F &#39;old&#39; logs</code> không thay thế <code class="inline-code">find logs -name &#39;*.log&#39;</code>; một bên tìm text trong input, một bên duyệt path theo property. Khi cần cả hai, làm từng bước và kiểm tra output mỗi bước.</p>
+<figure class="book-figure diagram-flow" id="fig-03-2">
+  <div class="flow-node accent">grep: file content</div>
+  <div class="flow-arrow">↓ match text inside lines</div>
+  <div class="flow-node strong">matching lines</div>
+  <div class="flow-divider">khác với</div>
+  <div class="flow-node accent">find: filesystem paths / objects</div>
+  <div class="flow-arrow">↓ select by type, name, or scope</div>
+  <div class="flow-node strong">matching paths / objects</div>
+  <figcaption>Figure 3.2 - grep đọc content; find chọn filesystem paths hoặc objects.</figcaption>
+</figure>
+
+<h2 id="section-3-12-xargs-tu-stdin-sang-command-arguments">3.12 xargs - từ stdin sang command arguments</h2><p>Có hai cách đưa dữ liệu tới command: <strong>stdin</strong> là stream text command đọc; <strong>command arguments</strong> là values nằm sau tên command trong command line. Ví dụ:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">wc -l events.log
+cat &lt; events.log</code></pre></figure><p>Lệnh đầu đưa filename như argument cho <code class="inline-code">wc</code>; lệnh sau đưa bytes qua stdin. <code class="inline-code">xargs</code> đọc text từ stdin rồi biến các phần text đó thành arguments cho command khác.</p>
+<figure class="book-figure diagram-flow" id="fig-03-3">
+  <div class="flow-node accent">stdin</div>
+  <div class="flow-arrow">↓ text items</div>
+  <div class="flow-node">xargs</div>
+  <div class="flow-arrow">↓ builds command arguments</div>
+  <div class="flow-node strong">command receives paths as arguments</div>
+  <figcaption>Figure 3.3 - xargs chuyển các item từ stdin thành arguments cho command kế tiếp.</figcaption>
+</figure>
+
+<p>Trước hết chỉ list:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">find logs -type f -name &#39;*.log&#39; -print</code></pre></figure><p>Filename có space hoặc newline sẽ phá cách <code class="inline-code">xargs</code> mặc định chia text theo whitespace. Vì vậy không dạy pattern unsafe như production default. Sau khi hiểu problem, dùng delimiter NUL:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">find logs -type f -name &#39;*.log&#39; -print0 | xargs -0 -r -n 1 wc -l --</code></pre></figure><p><code class="inline-code">-print0</code> tạo separator an toàn hơn; <code class="inline-code">xargs -0</code> đọc separator đó; <code class="inline-code">-r</code> tránh chạy khi input rỗng; <code class="inline-code">-n 1</code> cho một path mỗi lần. <code class="inline-code">--</code> giúp path bắt đầu bằng <code class="inline-code">-</code> không bị hiểu là option. Đây là một command để inspect, không phải lời mời chạy mutation.</p>
+<h2 id="section-3-13-pipe-cac-tool-nho-voi-nhau">3.13 Pipe các tool nhỏ với nhau</h2><p>Bây giờ ghép các tool đã biết:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">grep -F &#39;ERROR&#39; events.log | cut -d&#39; &#39; -f2 | sort | uniq -c</code></pre></figure><p>Luồng suy nghĩ là: chọn matching lines → lấy service field → sort → count. Nếu summary sai, tháo pipeline ra và chạy từng đoạn. Đừng thêm command chỉ để làm output “đẹp” hơn.</p>
+<h2 id="section-3-14-preview-awk-va-sed-giai-quyet-bai-toan-gi">3.14 Preview: awk và sed giải quyết bài toán gì?</h2><p><code class="inline-code">awk</code> phù hợp khi cần đọc fields và tính summary theo điều kiện; <code class="inline-code">sed</code> phù hợp khi cần inspect hoặc biến đổi từng line theo rule. Ở chapter này chỉ xem purpose, chưa học programming hay script phức tạp:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">awk &#39;$3 == &quot;ERROR&quot; { print $2 }&#39; events.log
+sed -n &#39;1,3p&#39; events.log</code></pre></figure><p><code class="inline-code">awk</code> in field 2 khi field 3 là <code class="inline-code">ERROR</code>; <code class="inline-code">sed -n &#39;1,3p&#39;</code> inspect ba dòng đầu. Nếu delimiter/schema đổi, cả hai command vẫn có thể chạy nhưng meaning sai. Phần Bash for DevOps sẽ đi sâu hơn; đừng dùng <code class="inline-code">sed -i</code> trên source hoặc production file ở lab này.</p>
+<h2 id="section-3-15-failure-modes-va-debugging">3.15 Failure modes và debugging</h2><div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Kiểm tra nhỏ nhất</th>
+<th>Câu hỏi cần hỏi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code class="inline-code">grep</code> không match</td>
+<td><code class="inline-code">pwd</code>, <code class="inline-code">wc -l</code>, <code class="inline-code">grep -n -F</code></td>
+<td>path/content có đúng không?</td>
+</tr>
+<tr>
+<td>Count bằng 0</td>
+<td>xem raw matching lines</td>
+<td>no match hay input error?</td>
+</tr>
+<tr>
+<td><code class="inline-code">uniq -c</code> đếm thiếu</td>
+<td>thêm <code class="inline-code">sort</code> trước <code class="inline-code">uniq</code></td>
+<td>duplicates đã liền kề chưa?</td>
+</tr>
+<tr>
+<td><code class="inline-code">cut</code> field sai</td>
+<td><code class="inline-code">head</code> và đếm delimiter</td>
+<td>spaces/tabs có đúng assumption?</td>
+</tr>
+<tr>
+<td><code class="inline-code">find</code> không thấy file</td>
+<td><code class="inline-code">find logs -type f -print</code></td>
+<td>scope/type/name có đúng không?</td>
+</tr>
+<tr>
+<td><code class="inline-code">xargs</code> tách sai filename</td>
+<td>tạo filename có space trong fixture</td>
+<td>boundary stdin → arguments có an toàn?</td>
+</tr>
+</tbody></table></div>
+<p>Giữ raw input và raw matches trước transform. Với file rỗng, ghi rõ empty có nghĩa “không có evidence” hay “không có lỗi”. Với schema drift, test một dòng malformed và fail rõ thay vì in summary đáng tin giả.</p>
+<h2 id="section-3-16-stop-recall">3.16 STOP &amp; RECALL</h2><ol>
+<li><code class="inline-code">grep</code> tìm content hay filesystem objects?</li>
+<li><code class="inline-code">find</code> tìm content hay paths/objects?</li>
+<li>Vì sao literal search nên đi trước regex?</li>
+<li><code class="inline-code">stdin</code> khác command arguments thế nào?</li>
+<li>Vì sao filename có whitespace nguy hiểm với <code class="inline-code">xargs</code> mặc định?</li>
+<li><code class="inline-code">find ... -print0 | xargs -0</code> giải quyết boundary nào?</li>
+<li>Vì sao <code class="inline-code">uniq -c</code> thường cần <code class="inline-code">sort</code> trước?</li>
+</ol>
+<div class="recall"><div class="label">Một câu để tự chấm</div>
+Trước khi chạy pipeline, hãy nói input là text hay paths, tool đang chọn gì, delimiter là gì, và evidence nào sẽ chứng minh kết quả.</div>
+
+<h2 id="section-3-17-guided-lab">3.17 Guided Lab</h2><h3 id="section-objective">Objective</h3><p>Tạo một log fixture nhỏ, inspect trước khi search, giữ raw matches, tạo summary, tìm <code class="inline-code">.log</code> objects, và kiểm tra filename boundary mà không mutate source.</p>
+<h3 id="section-safety-boundary">Safety boundary</h3><p>Chỉ dùng <code class="inline-code">$HOME/fieldbook-labs/ch03-search</code>. Không <code class="inline-code">rm</code>, <code class="inline-code">mv</code>, <code class="inline-code">chmod</code>, <code class="inline-code">chown</code>, <code class="inline-code">sed -i</code>, hay <code class="inline-code">xargs</code> mutation trên production path. Mọi <code class="inline-code">find</code> bắt đầu bằng list phase.</p>
+<h3 id="section-setup">Setup</h3><figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">mkdir -p &quot;$HOME/fieldbook-labs/ch03-search/logs/archive&quot;
+cd &quot;$HOME/fieldbook-labs/ch03-search&quot;
+printf &#39;%s\n&#39; &#39;10:00 api INFO request-start&#39; &#39;10:01 api ERROR timeout&#39; &#39;10:02 worker ERROR queue-full&#39; &#39;10:03 api INFO request-done&#39; &#39;10:04 api ERROR timeout&#39; &gt; events.log
+printf &#39;today\n&#39; &gt; logs/app.log
+printf &#39;old\n&#39; &gt; logs/archive/old.log
+printf &#39;temporary\n&#39; &gt; logs/debug.tmp</code></pre></figure><h3 id="section-mission">Mission</h3><ol>
+<li>Chạy <code class="inline-code">wc -l events.log</code>, <code class="inline-code">head -n 2 events.log</code>, và <code class="inline-code">tail -n 2 events.log</code>; ghi observations.</li>
+<li>Chạy <code class="inline-code">grep -n -F &#39;ERROR&#39; events.log | tee raw-errors.txt</code>; xác nhận có 3 matching lines.</li>
+<li>Chạy <code class="inline-code">grep -F &#39;ERROR&#39; events.log | cut -d&#39; &#39; -f2 | sort | uniq -c</code>; kiểm tra <code class="inline-code">api</code> là 2 và <code class="inline-code">worker</code> là 1.</li>
+<li>Chạy <code class="inline-code">find logs -type f -name &#39;*.log&#39; -print</code>; phân biệt paths với content.</li>
+<li>Tạo filename có space bằng <code class="inline-code">printf &#39;x\n&#39; &gt; &#39;logs/file with space.log&#39;</code>, rồi chạy <code class="inline-code">find logs -type f -name &#39;*.log&#39; -print0 | xargs -0 -r -n 1 wc -l --</code> để quan sát boundary an toàn.</li>
+<li>Chạy <code class="inline-code">awk &#39;$3 == &quot;ERROR&quot; { print $2 }&#39; events.log</code> và <code class="inline-code">sed -n &#39;1,3p&#39; events.log</code> chỉ như preview; không dùng script nâng cao.</li>
+</ol>
+<h3 id="section-expected-observation">Expected observation</h3><p><code class="inline-code">events.log</code> có 5 lines; raw error output có 3 lines; summary có <code class="inline-code">api 2</code> và <code class="inline-code">worker 1</code>; <code class="inline-code">find</code> trả về ba <code class="inline-code">.log</code> paths sau khi tạo filename có space. Không file input nào bị sửa.</p>
+<h3 id="section-learner-observation">Learner observation</h3><div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Quan sát thật</th>
+<th>Nó chứng minh</th>
+<th>Nó chưa chứng minh</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code class="inline-code">head</code>/<code class="inline-code">tail</code></td>
+<td></td>
+<td>sample ở boundary</td>
+<td>toàn bộ file</td>
+</tr>
+<tr>
+<td><code class="inline-code">raw-errors.txt</code></td>
+<td></td>
+<td>raw matching lines</td>
+<td>parser đúng mọi schema</td>
+</tr>
+<tr>
+<td>service summary</td>
+<td></td>
+<td>count theo field hiện tại</td>
+<td>log format luôn ổn định</td>
+</tr>
+<tr>
+<td><code class="inline-code">find</code> output</td>
+<td></td>
+<td>paths/objects trong scope</td>
+<td>nội dung file</td>
+</tr>
+<tr>
+<td><code class="inline-code">xargs -0</code> output</td>
+<td></td>
+<td>NUL-safe argument boundary</td>
+<td>mutation an toàn</td>
+</tr>
+</tbody></table></div>
+<h3 id="section-reasoning-questions">Reasoning questions</h3><ul>
+<li>Nếu <code class="inline-code">grep</code> trả no match, đó là empty result hay input error?</li>
+<li>Tại sao <code class="inline-code">grep -F &#39;ERROR&#39;</code> và <code class="inline-code">find logs -name &#39;*.log&#39;</code> trả hai loại evidence khác nhau?</li>
+<li>Nếu thêm nhiều spaces giữa fields, <code class="inline-code">cut -d&#39; &#39; -f2</code> còn đúng không?</li>
+<li><code class="inline-code">stdin</code> của <code class="inline-code">xargs</code> và arguments của <code class="inline-code">wc</code> khác nhau ở đâu?</li>
+<li>Vì sao không dùng <code class="inline-code">find ... | xargs rm</code> làm default?</li>
+</ul>
+<h3 id="section-cleanup">Cleanup</h3><p>Kiểm tra <code class="inline-code">pwd</code>, sau đó chỉ xóa disposable lab directory khi đã lưu observations:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">cd &quot;$HOME/fieldbook-labs&quot;
+rm -rf -- ch03-search</code></pre></figure><h3 id="section-pass-criteria">PASS criteria</h3><ul>
+<li>Raw fixture và raw matches được giữ trước transform.</li>
+<li>Summary khớp counts đã biết và có một sample kiểm tra thủ công.</li>
+<li>Bạn phân biệt được <code class="inline-code">grep</code> content với <code class="inline-code">find</code> objects/paths.</li>
+<li>Bạn giải thích được stdin versus arguments và whitespace risk của <code class="inline-code">xargs</code>.</li>
+<li>Không có destructive find action nào được chạy.</li>
+</ul>
+<h2 id="section-3-18-chapter-checkpoint">3.18 Chapter Checkpoint</h2><p>Bạn đạt Chapter 03 khi có thể chọn đúng tool cho content search, object search, line inspection, counting, sorting, field extraction và argument handoff; đồng thời nói rõ glob khác regex, raw evidence cần được giữ, và output hợp lý chưa tự chứng minh schema hay parser đúng.</p>
+<hr class="rule">
+<p class="small"><strong>DevOps connection:</strong> Search/transform reasoning giúp bạn tìm ERROR lines, xem log tail, đếm status lặp, tìm `.log` objects, lấy field nhỏ và điều tra evidence mà không phá input source.</p>
+</article>
+  </main>
+  <div class="screen-footer">Volume 1 - Linux Systems &amp; Operations <span>Chapter 03 V3.1</span></div>
+</body>
+</html>

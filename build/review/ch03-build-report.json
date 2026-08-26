@@ -1,0 +1,32 @@
+{
+  "pageCount": 12,
+  "tocEntries": 18,
+  "figureCount": 3,
+  "chapter": "03",
+  "title": "Search, Transform & Inspect",
+  "template": "Chapter 00 V3.1 golden pedagogical and visual language",
+  "canonical_source": "chapters/03-search-transform/chapter.md",
+  "pdf": "build/chapters-v3.1/chapter03/chapter03-v3.1.pdf",
+  "html": "build/chapters-v3.1/chapter03/chapter03-v3.1.html",
+  "screenshot_dir": "build/chapters-v3.1/chapter03/screenshots",
+  "pageMap": {
+    "section-3-1-khi-du-lieu-qua-nhieu-e-oc-bang-mat": 3,
+    "section-3-2-inspect-truoc-khi-search": 3,
+    "section-3-3-head-va-tail": 4,
+    "section-3-4-grep-tim-matching-lines": 4,
+    "section-3-5-literal-search-truoc-regex": 4,
+    "section-3-6-grep-options-quan-trong": 5,
+    "section-3-7-wc-em-evidence": 5,
+    "section-3-8-sort-va-uniq": 5,
+    "section-3-9-cut-lay-field-on-gian": 6,
+    "section-3-10-find-tim-filesystem-objects": 6,
+    "section-3-11-find-khac-grep-the-nao": 6,
+    "section-3-12-xargs-tu-stdin-sang-command-arguments": 7,
+    "section-3-13-pipe-cac-tool-nho-voi-nhau": 8,
+    "section-3-14-preview-awk-va-sed-giai-quyet-bai-toan-gi": 8,
+    "section-3-15-failure-modes-va-debugging": 8,
+    "section-3-16-stop-recall": 9,
+    "section-3-17-guided-lab": 9,
+    "section-3-18-chapter-checkpoint": 10
+  }
+}
