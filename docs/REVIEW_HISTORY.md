@@ -17,6 +17,7 @@ Mục tiêu của bảng này không phải “săn điểm 10”, mà ghi lại
 | Chapter 02 first learner-ready pass | ~7.5/10 REVISE | Gần toàn English; diagram direction ambiguous; Ctrl-D; PIPESTATUS quá sớm; TOC backticks; stale release |
 | Chapter 02 second pass | ~8.8/10 REVISE | Đã sửa language/diagram/EOF/deep-dive; còn builtin-vs-process và Guided Lab merge command sai |
 | Chapter 02 final reviewed pass | **9.2/10 APPROVED** | Builtin accuracy, runnable labs, pipe failure reasoning, Vietnamese + technical English, visual QA pass |
+| Chapter 03 content review | **~9.1/10 APPROVED** | `uniq -c` full-line semantics with timestamps corrected by extracting service field; grep-vs-find and stdin-to-xargs diagrams added; stale screenshots cleaned; output semantics tested against the actual fixture |
 
 ## Scoring lesson
 

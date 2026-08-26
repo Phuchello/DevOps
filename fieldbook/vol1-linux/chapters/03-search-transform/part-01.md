@@ -182,7 +182,7 @@ Hãy nói thành câu trước khi chọn tool:
 | File `.log` nào tồn tại? | `find` | filesystem objects/paths |
 | Có bao nhiêu dòng match? | `wc` sau `grep` | output lines |
 
-`grep -F 'old' logs` không thay thế `find logs -name '*.log'`; một bên tìm text trong input, một bên duyệt path theo property. Khi cần cả hai, làm từng bước và kiểm tra output mỗi bước.
+`grep -R -F 'old' logs` tìm text content trong các file dưới `logs`; nó không thay thế `find logs -name '*.log'`, vì một bên tìm **file content**, một bên duyệt **filesystem paths / objects** theo property. Khi cần cả hai, làm từng bước và kiểm tra output mỗi bước.
 
 <figure class="book-figure diagram-flow" id="fig-03-2">
   <div class="flow-node accent">grep: file content</div>
