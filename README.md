@@ -72,8 +72,9 @@ Mental Model
 |---|---|
 | 00 — Linux Mental Model | ✅ Approved + Frozen |
 | 01 — Filesystem Namespace | ✅ Approved + Frozen |
-| 02 — Streams, Pipes & Redirection | ✅ Approved |
-| 03+ | 🟡 Authoring / review pipeline |
+| 02 — Streams, Pipes & Redirection | ✅ Approved + Frozen |
+| 03 — Search, Transform & Inspect | ✅ Approved + Frozen |
+| 04 | 🟡 Next authoring target |
 
 Canonical learner sources được publish tại [`fieldbook/vol1-linux/`](fieldbook/vol1-linux/).
 
