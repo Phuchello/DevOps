@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DevOps Engineering Fieldbook - Chapter 02</title>
+  <link rel="stylesheet" href="../../styles/book.css">
+</head>
+<body>
+  <nav class="screen-nav" aria-label="Book navigation"><span>DevOps Engineering Fieldbook</span><span>Volume 1 - Linux Systems &amp; Operations</span></nav>
+  <main class="book-shell">
+    <section class="cover" id="cover"><div class="cover-kicker">VOLUME 1</div><h1>DevOps Engineering Fieldbook</h1><p class="cover-volume">Linux Systems &amp; Operations</p><p class="cover-subtitle">Streams, Pipes &amp; Redirection</p><div class="cover-rule"></div><p class="cover-audience">A beginner-first lesson in where command input and output travel.</p></section>
+    <section class="toc" id="table-of-contents"><p class="eyebrow">CONTENTS</p><h2>Chapter 02 - Streams, Pipes &amp; Redirection</h2><div class="toc-list"><a class="toc-entry" href="#section-2-1-mot-cau-hoi-on-gian-output-cua-command-i-au"><span class="toc-label">2.1 Một câu hỏi đơn giản: output của command đi đâu?</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-2-hieu-input-va-output-truoc-khi-hoc-thuat-ngu"><span class="toc-label">2.2 Hiểu input và output trước khi học thuật ngữ</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-3-standard-input-stdin"><span class="toc-label">2.3 Standard Input (stdin)</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-4-standard-output-stdout"><span class="toc-label">2.4 Standard Output - stdout</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-5-standard-error-stderr"><span class="toc-label">2.5 Standard Error - stderr</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-6-file-descriptors-0-1-and-2"><span class="toc-label">2.6 File descriptors 0, 1, and 2</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-7-output-redirection"><span class="toc-label">2.7 Output redirection: &gt;</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-8-append-redirection"><span class="toc-label">2.8 Append redirection: &gt;&gt;</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-9-input-redirection"><span class="toc-label">2.9 Input redirection: &lt;</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-10-stderr-redirection-2"><span class="toc-label">2.10 stderr redirection: 2&gt;</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-11-gop-stdout-va-stderr"><span class="toc-label">2.11 Gộp stdout và stderr</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-12-pipes"><span class="toc-label">2.12 Pipes: |</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-13-vi-sao-pipe-khong-phai-temporary-file"><span class="toc-label">2.13 Vì sao pipe không phải temporary file?</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-14-exit-status-khac-error-output-the-nao"><span class="toc-label">2.14 Exit status khác error output thế nào?</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-15-nhung-loi-thuong-gap-va-cach-debugging"><span class="toc-label">2.15 Những lỗi thường gặp và cách debugging</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-16-stop-recall"><span class="toc-label">2.16 STOP &amp; RECALL</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-17-bai-lab-co-huong-dan"><span class="toc-label">2.17 Bài lab có hướng dẫn</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-18-iem-kiem-tra-cuoi-chapter"><span class="toc-label">2.18 Điểm kiểm tra cuối chapter</span><span class="toc-page">—</span></a></div></section>
+    <section class="chapter-header" id="chapter-02"><p class="eyebrow">CHAPTER 02</p><h1>Streams, Pipes &amp; Redirection</h1><p class="chapter-dek">Follow text as it enters a command, leaves it and becomes evidence.</p><div class="chapter-tags"><span>CORE</span><span>HANDS-ON</span><span>PRODUCTION</span></div></section>
+    <article class="chapter-content">
+<section class="worked-example" id="worked-example-stream-routing">
+  <p class="eyebrow">WORKED EXAMPLE</p>
+  <h2>Luồng thực thi đầy đủ: tách stdout và stderr</h2>
+  <div class="example-flow">
+    <p><strong>Problem.</strong> Muốn giữ normal output và diagnostic output thành hai evidence file để đọc riêng.</p>
+    <p><strong>Input / initial state.</strong> Thư mục lab có <code class="inline-code">colors.txt</code>; <code class="inline-code">does-not-exist.txt</code> chưa tồn tại.</p>
+    <p><strong>Command.</strong></p>
+    <pre><code>ls colors.txt does-not-exist.txt &gt; normal.txt 2&gt; errors.txt</code></pre>
+    <p><strong>Execution flow.</strong> Shell mở hai destination trước khi command chạy → <code class="inline-code">ls</code> ghi tên file có thật qua stdout → <code class="inline-code">ls</code> ghi diagnostic cho file thiếu qua stderr.</p>
+    <p><strong>Intermediate state.</strong> <code class="inline-code">normal.txt</code> đã nhận một dòng; <code class="inline-code">errors.txt</code> đã nhận diagnostic, dù command chỉ chạy một lần.</p>
+  </div>
+  <div class="example-result">
+    <p><strong>Output / result.</strong></p>
+    <pre><code>$ cat normal.txt
+colors.txt
+$ cat errors.txt
+ls: cannot access 'does-not-exist.txt': No such file or directory</code></pre>
+    <p><strong>Why.</strong> <code class="inline-code">&gt;</code> đổi destination của stdout; <code class="inline-code">2&gt;</code> đổi destination của descriptor 2, tức stderr. Hai stream vẫn riêng.</p>
+  </div>
+  <div class="example-failure"><p><strong>Common failure.</strong> Dùng <code class="inline-code">&gt; combined.txt</code> rồi ngạc nhiên khi diagnostic vẫn hiện trên terminal.</p></div>
+  <div class="example-debug"><p><strong>Debugging evidence.</strong> Chạy <code class="inline-code">cat normal.txt</code>, <code class="inline-code">cat errors.txt</code>, rồi kiểm tra exit status ngay sau command. Đừng suy ra routing từ việc text cùng xuất hiện trên một terminal.</p></div>
+</section><p>Tags: <code class="inline-code">[BEGINNER]</code> <code class="inline-code">[CORE]</code> <code class="inline-code">[HANDS-ON]</code> <code class="inline-code">[PRODUCTION]</code></p>
+<h2 id="section-2-1-mot-cau-hoi-on-gian-output-cua-command-i-au">2.1 Một câu hỏi đơn giản: output của command đi đâu?</h2><p>Mở terminal và chạy một command rất nhỏ:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;hello from the terminal\n&#39;</code></pre></figure><p>Bạn thấy một dòng trên màn hình. Nhưng dòng đó đã đi đâu trước khi bạn nhìn thấy nó? Command có luôn phải hiện kết quả trên terminal không, hay ta có thể gửi cùng kết quả vào file?</p>
+<p>Hãy làm trong một lab directory có thể bỏ đi:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">mkdir -p &quot;$HOME/fieldbook-labs/ch02-streams&quot;
+cd &quot;$HOME/fieldbook-labs/ch02-streams&quot;
+printf &#39;first line\n&#39; &gt; message.txt
+cat message.txt</code></pre></figure><p><code class="inline-code">printf</code> tạo text. Dấu <code class="inline-code">&gt;</code> bảo shell gửi kết quả vào <code class="inline-code">message.txt</code>; <code class="inline-code">cat</code> đọc file đó rồi hiện text lên terminal. Đây là problem nhỏ của chapter: <strong>text đi vào đâu và đi ra đâu?</strong> Chưa cần nhớ thuật ngữ Linux. Trước hết, ta chỉ phân biệt input source và output destination.</p>
+<h2 id="section-2-2-hieu-input-va-output-truoc-khi-hoc-thuat-ngu">2.2 Hiểu input và output trước khi học thuật ngữ</h2><p>Một command có thể nhận text từ một nơi và gửi text tới một nơi khác. Hãy tạo file màu, rồi đọc nó:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;red\nblue\ngreen\n&#39; &gt; colors.txt
+cat colors.txt
+wc -l colors.txt</code></pre></figure><p><code class="inline-code">wc -l</code> đếm số dòng. Ở ví dụ này, bạn đưa filename cho <code class="inline-code">wc</code>; command đọc file và in kết quả. Quan sát quan trọng: text không tự “thuộc về màn hình”. Terminal chỉ là một destination thường gặp.</p>
+<figure class="book-figure diagram-flow" id="fig-02-1">
+  <div class="flow-node accent">INPUT SOURCE<br><small>keyboard / file</small></div>
+  <div class="flow-arrow">↓</div>
+  <div class="flow-node">PROCESS<br><small>a running command</small></div>
+  <div class="flow-arrow">↓</div>
+  <div class="flow-node strong">OUTPUT DESTINATION<br><small>terminal / file</small></div>
+  <figcaption>Figure 2.1 - Mô hình đầu tiên: input đi vào process; process gửi kết quả tới một output destination.</figcaption>
+</figure>
+
+<p>Mũi tên luôn đi từ input source tới process, rồi từ process tới output destination. Các phần sau chỉ đặt tên chính xác cho những đường đi này.</p>
+<h2 id="section-2-3-standard-input-stdin">2.3 Standard Input (stdin)</h2><p>Một command có thể là <strong>shell builtin</strong> hoặc external program. <code class="inline-code">printf</code> thường là Bash builtin và có thể chạy ngay trong shell process; external program thì thường chạy trong process riêng. Dù là builtin hay external program, các khái niệm stdin, stdout, stderr và redirection vẫn áp dụng như nhau. Các diagram ghi PROCESS minh họa trường hợp external command; ta không cần đi sâu hơn vào implementation của shell ở đây.</p>
+<p>Một external program chạy như một <strong>process</strong>: một chương trình đang chạy. Process thường có một đường nhận input mặc định, tên là <strong>standard input (stdin)</strong>.</p>
+<p>Thử để <code class="inline-code">cat</code> đọc trực tiếp từ terminal:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">cat</code></pre></figure><p>Gõ một dòng ngắn rồi nhấn Enter; <code class="inline-code">cat</code> lặp lại dòng nó nhận được. Khi <code class="inline-code">cat</code> đang đọc stdin từ một interactive terminal, nhấn <code class="inline-code">Ctrl-D</code> trên một dòng trống sẽ báo <strong>end-of-input / EOF</strong> cho lần đọc đó. Điều này không có nghĩa keyboard hoặc terminal ngừng nhận input vĩnh viễn; sau khi <code class="inline-code">cat</code> kết thúc, shell lại nhận input bình thường.</p>
+<p>Lần hai, đổi input source thành file:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">cat &lt; colors.txt</code></pre></figure><p><code class="inline-code">&lt;</code> là <strong>input redirection</strong>: shell mở <code class="inline-code">colors.txt</code> và nối nó vào stdin của <code class="inline-code">cat</code> trước khi <code class="inline-code">cat</code> chạy. <code class="inline-code">cat colors.txt</code> và <code class="inline-code">cat &lt; colors.txt</code> có thể cho cùng text, nhưng cơ chế khác nhau: một bên là filename argument, bên kia là stdin.</p>
+<h2 id="section-2-4-standard-output-stdout">2.4 Standard Output - stdout</h2><p>Khi một process tạo ra kết quả bình thường, kết quả đó thường đi qua <strong>standard output (stdout)</strong>. Nếu không có redirection, stdout thường đi tới terminal.</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;one\ntwo\nthree\n&#39;
+printf &#39;one\ntwo\nthree\n&#39; &gt; numbers.txt
+wc -l &lt; numbers.txt</code></pre></figure><p>Experiment thứ hai cho thấy stdout có thể đổi destination mà program không cần biết file tên gì. Shell làm việc nối stdout tới <code class="inline-code">numbers.txt</code>; <code class="inline-code">printf</code> chỉ ghi kết quả bình thường của nó.</p>
+<figure class="book-figure diagram-flow" id="fig-02-2">
+  <div class="flow-node accent">keyboard / file</div><div class="flow-arrow">↓ stdin</div>
+  <div class="flow-node">process</div><div class="flow-arrow">↓ stdout</div>
+  <div class="flow-node strong">terminal / file</div>
+  <figcaption>Figure 2.2 - stdin đưa input vào process; stdout mang kết quả bình thường ra ngoài.</figcaption>
+</figure>
+
+<h2 id="section-2-5-standard-error-stderr">2.5 Standard Error - stderr</h2><p>Kết quả bình thường không phải là text duy nhất command tạo ra. <strong>standard error (stderr)</strong> là stream riêng thường được dùng cho diagnostic messages: file thiếu, option sai, hoặc permission bị từ chối.</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">cat does-not-exist.txt</code></pre></figure><p>Message báo lỗi thường hiện cùng terminal với stdout, nhưng không vì thế mà nó là stdout. Hai stream tách riêng để bạn có thể lưu kết quả bình thường mà không trộn diagnostic vào đó.</p>
+<figure class="book-figure diagram-svg" id="fig-02-3">
+  <svg viewBox="0 0 820 420" role="img" aria-labelledby="fig-02-3-title fig-02-3-desc" xmlns="http://www.w3.org/2000/svg">
+    <title id="fig-02-3-title">Ba standard streams</title>
+    <desc id="fig-02-3-desc">Keyboard or file feeds stdin of a process. The process sends stdout and stderr independently to terminal or file destinations.</desc>
+    <defs><marker id="arrow-02-3" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#1d5d82"/></marker></defs>
+    <rect class="svg-node svg-node-accent" x="40" y="150" width="170" height="92" rx="14"/>
+    <text class="svg-label" x="125" y="184" text-anchor="middle">keyboard / file</text><text class="svg-sub" x="125" y="209" text-anchor="middle">input source</text>
+    <rect class="svg-node" x="325" y="150" width="170" height="92" rx="14"/><text class="svg-label" x="410" y="184" text-anchor="middle">PROCESS</text><text class="svg-sub" x="410" y="209" text-anchor="middle">external command</text>
+    <rect class="svg-node svg-node-strong" x="610" y="60" width="170" height="78" rx="14"/><text class="svg-label" x="695" y="94" text-anchor="middle">terminal / file</text><text class="svg-sub" x="695" y="119" text-anchor="middle">stdout destination</text>
+    <rect class="svg-node svg-node-strong" x="610" y="282" width="170" height="78" rx="14"/><text class="svg-label" x="695" y="316" text-anchor="middle">terminal / file</text><text class="svg-sub" x="695" y="341" text-anchor="middle">stderr destination</text>
+    <line class="svg-arrow" x1="210" y1="196" x2="325" y2="196" marker-end="url(#arrow-02-3)"/><text class="svg-arrow-label" x="267" y="181" text-anchor="middle">stdin</text>
+    <path class="svg-arrow" d="M495 176 C540 176 552 100 610 100" marker-end="url(#arrow-02-3)"/><text class="svg-arrow-label" x="548" y="133" text-anchor="middle">stdout</text>
+    <path class="svg-arrow" d="M495 216 C540 216 552 321 610 321" marker-end="url(#arrow-02-3)"/><text class="svg-arrow-label" x="548" y="285" text-anchor="middle">stderr</text>
+  </svg>
+  <figcaption>Figure 2.3 - Ba stream quen thuộc: stdin đi vào process; stdout và stderr đi ra theo hai đường riêng.</figcaption>
+</figure>
+
+<div class="warning"><div class="label">TRAP</div>
+Thấy error message trên màn hình không chứng minh nó là normal output. Giữ stdout và stderr tách riêng cho tới khi bạn chủ động merge chúng.</div>
+
+<h2 id="section-2-6-file-descriptors-0-1-and-2">2.6 File descriptors 0, 1, and 2</h2><p>Sau khi hiểu ba stream, ta mới cần <strong>file descriptor</strong>. Đây là integer handle mà process dùng để tham chiếu tới một open I/O resource. Nó không phải physical file: một descriptor có thể tham chiếu terminal, regular file, một đầu pipe, hoặc resource đang mở khác.</p>
+<table>
+<thead>
+<tr>
+<th align="right">Descriptor</th>
+<th>Stream</th>
+<th>Công việc thường gặp</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right"><code class="inline-code">0</code></td>
+<td>stdin</td>
+<td>đọc input</td>
+</tr>
+<tr>
+<td align="right"><code class="inline-code">1</code></td>
+<td>stdout</td>
+<td>ghi normal output</td>
+</tr>
+<tr>
+<td align="right"><code class="inline-code">2</code></td>
+<td>stderr</td>
+<td>ghi diagnostic output</td>
+</tr>
+</tbody></table>
+<p>Shell thiết lập các descriptor/redirection trước khi process chạy. Vì vậy <code class="inline-code">2&gt;errors.txt</code> nghĩa là shell đổi destination của descriptor 2, tức stderr; không phải <code class="inline-code">ls</code> tự quyết định mọi error phải vào file đó.</p>
+<h2 id="section-2-7-output-redirection">2.7 Output redirection: `>`</h2><p>Quay lại câu hỏi đầu: có thể gửi stdout vào file không? Có. <code class="inline-code">&gt;</code> redirect stdout vào file và thay thế nội dung cũ nếu file đã tồn tại.</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;old line\n&#39; &gt; replace-me.txt
+printf &#39;new line\n&#39; &gt; replace-me.txt
+cat replace-me.txt</code></pre></figure><p>Observation: chỉ còn <code class="inline-code">new line</code>. Visual model là <code class="inline-code">process stdout → file</code>; technical term là output redirection. Nếu report bị ngắn bất ngờ, dừng ghi thêm, xem <code class="inline-code">cat report.txt</code>, rồi kiểm tra bạn có dùng <code class="inline-code">&gt;</code> thay vì append không. Trong DevOps, <code class="inline-code">&gt;</code> hợp với report mới; không hợp khi bạn phải giữ evidence cũ.</p>
+<h2 id="section-2-8-append-redirection">2.8 Append redirection: `>>`</h2><p><code class="inline-code">&gt;&gt;</code> vẫn redirect stdout, nhưng append vào cuối file thay vì thay thế:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;first run\n&#39; &gt; run-history.txt
+printf &#39;second run\n&#39; &gt;&gt; run-history.txt
+cat run-history.txt</code></pre></figure><p>Hai dòng đều còn. Với operational log, append có ích nhưng dễ trộn nhiều lần chạy. Ghi timestamp hoặc run ID khi evidence cần phân biệt từng lần.</p>
+<figure class="code-figure code-output"><div class="code-label">Text example</div><pre><code class="language-text">stdout → file
+&gt;   replace old contents
+&gt;&gt;  append after old contents</code></pre></figure><h2 id="section-2-9-input-redirection">2.9 Input redirection: `<`</h2><p><code class="inline-code">&lt;</code> đổi input source của stdin:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;alpha\nbeta\ngamma\n&#39; &gt; words.txt
+wc -l &lt; words.txt</code></pre></figure><p>File là input source, <code class="inline-code">wc</code> là process, terminal nhận stdout. Nếu file không tồn tại:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">wc -l &lt; missing-words.txt</code></pre></figure><p>Shell không mở được input file nên <code class="inline-code">wc</code> không nhận stdin như dự định. Diagnostic đi ra stderr. Debug bằng <code class="inline-code">pwd</code> và <code class="inline-code">ls -l</code>; đừng vội kết luận <code class="inline-code">wc</code> đếm sai.</p>
+<h2 id="section-2-10-stderr-redirection-2">2.10 stderr redirection: `2>`</h2><p>Để lưu diagnostic riêng, redirect descriptor 2:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">ls colors.txt does-not-exist.txt &gt; normal.txt 2&gt; errors.txt
+cat normal.txt
+cat errors.txt</code></pre></figure><p><code class="inline-code">ls</code> xử lý filename có thật bằng stdout và báo filename thiếu bằng stderr. Sau redirection, <code class="inline-code">normal.txt</code> giữ normal output; <code class="inline-code">errors.txt</code> giữ diagnostic.</p>
+<figure class="book-figure diagram-svg" id="fig-02-4">
+  <svg viewBox="0 0 820 250" role="img" aria-labelledby="fig-02-4-title fig-02-4-desc" xmlns="http://www.w3.org/2000/svg">
+    <title id="fig-02-4-title">Tách stdout và stderr vào hai file</title>
+    <desc id="fig-02-4-desc">A process sends stdout to normal.txt and stderr to errors.txt through two separate redirection routes.</desc>
+    <defs><marker id="arrow-02-4" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#1d5d82"/></marker></defs>
+    <rect class="svg-node" x="45" y="75" width="180" height="100" rx="14"/><text class="svg-label" x="135" y="113" text-anchor="middle">PROCESS</text><text class="svg-sub" x="135" y="139" text-anchor="middle">command</text>
+    <rect class="svg-node svg-node-strong" x="550" y="25" width="220" height="78" rx="14"/><text class="svg-label" x="660" y="59" text-anchor="middle">normal.txt</text><text class="svg-sub" x="660" y="84" text-anchor="middle">stdout</text>
+    <rect class="svg-node svg-node-strong" x="550" y="147" width="220" height="78" rx="14"/><text class="svg-label" x="660" y="181" text-anchor="middle">errors.txt</text><text class="svg-sub" x="660" y="206" text-anchor="middle">stderr</text>
+    <path class="svg-arrow" d="M225 105 C340 105 405 64 550 64" marker-end="url(#arrow-02-4)"/><text class="svg-arrow-label" x="383" y="80" text-anchor="middle">&gt; normal.txt</text>
+    <path class="svg-arrow" d="M225 145 C340 145 405 186 550 186" marker-end="url(#arrow-02-4)"/><text class="svg-arrow-label" x="383" y="172" text-anchor="middle">2&gt; errors.txt</text>
+  </svg>
+  <figcaption>Figure 2.4 - <code>command &gt;normal.txt 2&gt;errors.txt</code> giữ hai stream thành hai evidence file.</figcaption>
+</figure>
+
+<h2 id="section-2-11-gop-stdout-va-stderr">2.11 Gộp stdout và stderr</h2><p>Khi cần một transcript chung, <code class="inline-code">2&gt;&amp;1</code> có nghĩa “đưa stderr (descriptor 2) tới destination hiện tại của stdout (descriptor 1).” Shell đọc redirection từ trái sang phải.</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">ls colors.txt does-not-exist.txt &gt; combined.txt 2&gt;&amp;1
+cat combined.txt</code></pre></figure><p>Ở đây stdout đổi sang <code class="inline-code">combined.txt</code> trước; sau đó stderr theo destination hiện tại của stdout. So sánh:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">ls colors.txt does-not-exist.txt 2&gt;&amp;1 &gt; other.txt</code></pre></figure><p>Ở lệnh thứ hai, stderr theo stdout cũ (thường là terminal) trước khi stdout chuyển sang <code class="inline-code">other.txt</code>. Thứ tự tạo wiring khác nhau. <code class="inline-code">cmd &gt; file</code>, <code class="inline-code">cmd 2&gt; file</code>, và <code class="inline-code">cmd &gt; file 2&gt;&amp;1</code> vì thế phục vụ ba mục tiêu evidence khác nhau.</p>
+<h2 id="section-2-12-pipes">2.12 Pipes: `|`</h2><p>Nếu không cần giữ file trung gian, một <strong>pipe</strong> nối stdout của producer process vào stdin của consumer process:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;alpha\nbeta\nalpha\n&#39; | grep &#39;alpha&#39;
+printf &#39;alpha\nbeta\nalpha\n&#39; | grep &#39;alpha&#39; | wc -l</code></pre></figure><p><code class="inline-code">printf</code> là producer; <code class="inline-code">grep</code> lọc text; <code class="inline-code">wc</code> là consumer cuối. Pipe không tự động mang stderr. Error từ producer thường vẫn tới terminal, trừ khi bạn chủ động redirect/merge nó.</p>
+<figure class="book-figure diagram-svg" id="fig-02-5">
+  <svg viewBox="0 0 820 240" role="img" aria-labelledby="fig-02-5-title fig-02-5-desc" xmlns="http://www.w3.org/2000/svg">
+    <title id="fig-02-5-title">Pipe nối hai process</title>
+    <desc id="fig-02-5-desc">Process A sends stdout through a pipe to stdin of Process B.</desc>
+    <defs><marker id="arrow-02-5" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#1d5d82"/></marker></defs>
+    <rect class="svg-node svg-node-accent" x="55" y="75" width="220" height="90" rx="14"/><text class="svg-label" x="165" y="112" text-anchor="middle">Process A</text><text class="svg-sub" x="165" y="138" text-anchor="middle">stdout</text>
+    <rect class="svg-node svg-node-strong" x="545" y="75" width="220" height="90" rx="14"/><text class="svg-label" x="655" y="112" text-anchor="middle">Process B</text><text class="svg-sub" x="655" y="138" text-anchor="middle">stdin</text>
+    <line class="svg-arrow" x1="275" y1="120" x2="545" y2="120" marker-end="url(#arrow-02-5)"/><text class="svg-arrow-label" x="410" y="105" text-anchor="middle">pipe</text>
+  </svg>
+  <figcaption>Figure 2.5 - Pipe nối stdout của Process A với stdin của Process B; stderr không tự đi qua pipe.</figcaption>
+</figure>
+
+<h2 id="section-2-13-vi-sao-pipe-khong-phai-temporary-file">2.13 Vì sao pipe không phải temporary file?</h2><p>Pipe chuyển bytes trực tiếp giữa hai process đang chạy. Nó không phải temporary file có tên mà bạn có thể mở sau đó.</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;one\ntwo\nthree\n&#39; | head -n 2
+printf &#39;one\ntwo\nthree\n&#39; &gt; all-lines.txt
+head -n 2 all-lines.txt</code></pre></figure><p>Cả hai có thể hiện hai dòng. Nhưng route thứ hai cố ý giữ <code class="inline-code">all-lines.txt</code> làm evidence; route pipe không tạo file đó. Khi cần raw output cho incident, đừng giả định pipe đã giữ evidence cho bạn.</p>
+<h2 id="section-2-14-exit-status-khac-error-output-the-nao">2.14 Exit status khác error output thế nào?</h2><p>Diagnostic output và <strong>exit status</strong> là hai signal khác nhau. Sau khi command kết thúc, shell nhận exit status: <code class="inline-code">0</code> thường là success, non-zero nghĩa là command báo một điều cần xử lý.</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">grep &#39;purple&#39; colors.txt
+printf &#39;exit status: %s\n&#39; &quot;$?&quot;</code></pre></figure><p>Không có match thường làm <code class="inline-code">grep</code> trả <code class="inline-code">1</code>; điều đó có thể là result hợp lệ, không nhất thiết là command hỏng. Pipeline càng cần thận trọng: consumer cuối có thể tạo output hữu ích dù producer trước đó thất bại.</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">grep &#39;alpha&#39; missing-input.txt | wc -l
+printf &#39;pipeline exit status: %s\n&#39; &quot;$?&quot;</code></pre></figure><p>Bạn có thể thấy một số đếm từ <code class="inline-code">wc</code> trong khi <code class="inline-code">grep</code> đã in diagnostic ra stderr. Vì vậy output đẹp không tự chứng minh mọi stage thành công.</p>
+<h3 id="section-deep-dive-bash-preview">[DEEP-DIVE — BASH PREVIEW]</h3><p>Trong Bash, <code class="inline-code">PIPESTATUS</code> cho biết exit status của từng stage, và <code class="inline-code">set -o pipefail</code> thay đổi cách Bash báo pipeline failure. Đây là Bash-specific features; chúng ta sẽ học Bash arrays và shell options đúng cách trong phần Bash for DevOps. Không cần dùng cú pháp đó để pass core lab của chapter này.</p>
+<h2 id="section-2-15-nhung-loi-thuong-gap-va-cach-debugging">2.15 Những lỗi thường gặp và cách debugging</h2><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Kiểm tra nhỏ nhất</th>
+<th>Layer có thể sai</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Không thấy text trong <code class="inline-code">report.txt</code></td>
+<td><code class="inline-code">cat report.txt</code>; chạy lại không có <code class="inline-code">&gt;</code> trong lab</td>
+<td>stdout destination</td>
+</tr>
+<tr>
+<td>Error vẫn ở terminal</td>
+<td>kiểm tra có <code class="inline-code">2&gt;</code> chưa</td>
+<td>stderr có route riêng</td>
+</tr>
+<tr>
+<td>Report cũ biến mất</td>
+<td>so sánh <code class="inline-code">&gt;</code> với <code class="inline-code">&gt;&gt;</code></td>
+<td>replace hay append</td>
+</tr>
+<tr>
+<td><code class="inline-code">grep</code> không in gì</td>
+<td>xem <code class="inline-code">$?</code> ngay sau command</td>
+<td>result/status meaning</td>
+</tr>
+<tr>
+<td>Pipeline vẫn có count</td>
+<td>xem diagnostic và chạy producer riêng</td>
+<td>stdout không chứng minh success</td>
+</tr>
+<tr>
+<td>File merge thiếu error</td>
+<td>đọc <code class="inline-code">2&gt;&amp;1</code> từ trái sang phải</td>
+<td>redirection order</td>
+</tr>
+</tbody></table>
+<p>Debug theo thứ tự: chạy producer một mình; tách stdout/stderr vào hai file disposable; kiểm tra exit status ngay; thêm từng pipe; chỉ merge khi transcript chung thực sự cần thiết.</p>
+<h2 id="section-2-16-stop-recall">2.16 STOP & RECALL</h2><ol>
+<li>stdin có thể nhận input từ đâu ngoài keyboard?</li>
+<li>stdout và stderr khác nhau ở mục đích nào?</li>
+<li>Descriptor 0, 1, 2 là gì, và vì sao không phải physical files?</li>
+<li><code class="inline-code">&gt;</code> khác <code class="inline-code">&gt;&gt;</code> thế nào?</li>
+<li>Vì sao <code class="inline-code">cmd &gt; all.txt 2&gt;&amp;1</code> khác <code class="inline-code">cmd 2&gt;&amp;1 &gt; all.txt</code>?</li>
+<li>Pipe nối stream nào với stream nào?</li>
+<li>Vì sao pipeline có output chưa đủ để kết luận success?</li>
+</ol>
+<div class="recall"><div class="label">One-sentence self-check</div>
+Vẽ đường đi cho <code>producer &gt;out.txt 2&gt;err.txt</code>, rồi nói bạn sẽ xem đâu để biết producer có báo success hay không.</div>
+
+<h2 id="section-2-17-bai-lab-co-huong-dan">2.17 Bài lab có hướng dẫn</h2><h3 id="section-safety-boundary">Safety boundary</h3><p>Chỉ dùng <code class="inline-code">$HOME/fieldbook-labs/ch02-streams</code>. Không redirect vào source code, <code class="inline-code">/var/log</code>, configuration, hay production log. Không dùng <code class="inline-code">sudo</code>.</p>
+<h3 id="section-mission">Mission</h3><ol>
+<li>Tạo <code class="inline-code">colors.txt</code> bằng <code class="inline-code">printf</code> và đọc lại bằng <code class="inline-code">cat &lt; colors.txt</code>.</li>
+<li>So sánh <code class="inline-code">&gt;</code> và <code class="inline-code">&gt;&gt;</code> trên <code class="inline-code">run-history.txt</code>.</li>
+<li>Chạy <code class="inline-code">ls colors.txt does-not-exist.txt &gt; normal.txt 2&gt; errors.txt</code>; đọc từng file.</li>
+<li>Chạy <code class="inline-code">ls colors.txt does-not-exist.txt &gt; combined.txt 2&gt;&amp;1</code>, rồi chạy <code class="inline-code">cat combined.txt</code>; giải thích vì sao normal output và diagnostic output cùng xuất hiện trong file.</li>
+<li>Chạy command thành công <code class="inline-code">printf &#39;alpha\nbeta\nalpha\n&#39; | grep &#39;alpha&#39; | wc -l</code>. Sau đó chạy <code class="inline-code">grep &#39;alpha&#39; missing-input.txt | wc -l</code> và ngay lập tức chạy <code class="inline-code">printf &#39;pipeline exit status: %s\n&#39; &quot;$?&quot;</code>. Giải thích vì sao visible count và default Bash pipeline exit status không chứng minh mọi stage thành công.</li>
+</ol>
+<p>Core lab không yêu cầu <code class="inline-code">PIPESTATUS</code>, Bash arrays, hay <code class="inline-code">set -o pipefail</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Quan sát thật</th>
+<th>Nó chứng minh</th>
+<th>Nó chưa chứng minh</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code class="inline-code">normal.txt</code></td>
+<td></td>
+<td>stdout destination</td>
+<td>toàn bộ command success</td>
+</tr>
+<tr>
+<td><code class="inline-code">errors.txt</code></td>
+<td></td>
+<td>stderr destination</td>
+<td>stdout contents</td>
+</tr>
+<tr>
+<td><code class="inline-code">combined.txt</code></td>
+<td></td>
+<td>deliberate merge</td>
+<td>original stream provenance</td>
+</tr>
+<tr>
+<td><code class="inline-code">$?</code></td>
+<td></td>
+<td>status của command/pipeline vừa chạy</td>
+<td>mọi stage của Bash pipeline</td>
+</tr>
+</tbody></table>
+<p>Rollback chỉ trong lab directory:</p>
+<figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">rm -f colors.txt words.txt numbers.txt message.txt replace-me.txt run-history.txt normal.txt errors.txt combined.txt other.txt all-lines.txt</code></pre></figure><p>Kiểm tra <code class="inline-code">pwd</code> trước khi cleanup.</p>
+<h2 id="section-2-18-iem-kiem-tra-cuoi-chapter">2.18 Điểm kiểm tra cuối chapter</h2><p>Bạn sẵn sàng đi tiếp khi có thể: giải thích input source → process → output destination; dùng stdin, stdout, stderr đúng ngữ cảnh; mô tả FD 0/1/2 là integer handles; chọn <code class="inline-code">&gt;</code>, <code class="inline-code">&gt;&gt;</code>, <code class="inline-code">&lt;</code>, <code class="inline-code">2&gt;</code>, <code class="inline-code">2&gt;&amp;1</code>, hoặc <code class="inline-code">|</code> cho một mục tiêu; và kiểm tra diagnostic cùng exit status thay vì nhìn output một mình.</p>
+<hr class="rule">
+<p class="small"><strong>DevOps connection:</strong> Stream reasoning giúp bạn redirect command output vào log đúng mục đích, giữ error output riêng, chain diagnostic commands, và không nhầm pipeline output với bằng chứng mọi stage đã thành công.</p>
+</article>
+  </main>
+  <div class="screen-footer">Volume 1 - Linux Systems &amp; Operations <span>Chapter 02</span></div>
+</body>
+</html>

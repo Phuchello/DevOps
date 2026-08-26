@@ -1,0 +1,15 @@
+{
+  "name": "devops-fieldbook-volume-1-build",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:chapter02": "node build/build-chapter02-html-first.mjs",
+    "check:reader-quality": "node build/check-reader-quality.mjs",
+    "check:frozen-sources": "node check-frozen-sources.mjs"
+  },
+  "devDependencies": {
+    "marked": "^15.0.12",
+    "pdf-lib": "^1.17.1",
+    "playwright": "^1.51.1"
+  }
+}

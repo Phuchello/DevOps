@@ -28,16 +28,17 @@ Reddit, Stack Overflow, GitHub Discussions, public LinkedIn, engineering blogs, 
 
 Lưu interview tree, ví dụ:
 
-```text
-Application unreachable
-├─ process running?
-├─ listening socket?
-├─ bind address?
-├─ DNS?
-├─ route?
-├─ firewall?
-└─ application health?
-```
+| Step | Question |
+|---:|---|
+| 1 | Is the process running? |
+| 2 | Is a socket listening? |
+| 3 | Is the bind address correct? |
+| 4 | Does DNS resolve? |
+| 5 | Is the route available? |
+| 6 | Is the firewall allowing the traffic? |
+| 7 | Is the application healthy? |
+
+The path starts with **Application unreachable** and moves from the local process boundary toward network and application health. Use a real diagram in reader chapters when this reasoning path is taught; this policy document keeps the decision path as a table.
 
 Với mỗi câu quan trọng nên ghi competency, weak mental model, strong reasoning structure, follow-up chain, troubleshooting variant và hands-on variant.
 

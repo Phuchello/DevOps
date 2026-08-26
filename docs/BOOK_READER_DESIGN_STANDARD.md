@@ -2,6 +2,16 @@
 
 Tài liệu này định nghĩa **reader-facing design** cho các PDF/HTML của DevOps Engineering Fieldbook. Mục tiêu là tạo cảm giác của một technical textbook được biên tập, không phải build report hay artifact nội bộ.
 
+## 0. Artifact order: HTML-first, PDF-second
+
+Mỗi chapter phải đi qua đúng thứ tự:
+
+1. Canonical learner source (Markdown).
+2. Chapter HTML semantic, reader-facing.
+3. Chapter PDF được export từ chính HTML đó.
+
+HTML là layout artifact chính để review. PDF là derivative dùng cho in/đọc offline; không tạo một bản PDF-only có nội dung hoặc bố cục khác HTML.
+
 ## 1. Một cuốn sách chỉ có một bìa
 
 Bìa duy nhất phải chứa:
@@ -77,6 +87,26 @@ Không thêm decorative stock art vào body. Diagram chỉ tồn tại khi nó l
 
 Cover có thể mang tính nhận diện thị giác, nhưng body ưu tiên clarity.
 
+ASCII art và topology dựa vào khoảng trắng bị cấm trong technical diagram. Không dùng các dòng `-`, `|`, `/`, `\\` hoặc block text để biểu diễn node/arrow. Dùng inline SVG có `viewBox`, geometry rõ ràng và label được neo vào shape/line; hoặc HTML/CSS diagram có node và arrow được định vị xác định. Một diagram phải giữ alignment khi mở trên HTML, export PDF, đổi font và scale trang.
+
+Trong migration của source đã freeze, renderer có thể thay thế một legacy diagram tại HTML boundary mà không đổi bytes Markdown. Từ chapter mới trở đi, canonical source phải chứa SVG hoặc HTML/CSS diagram trực tiếp; legacy block mới là build failure.
+
+Mỗi major concept cần ít nhất một concept diagram, sequence/flow diagram hoặc state table. Arrow phải có một nguồn, một đích và label nói đúng mechanism.
+
+## 7.1 Worked-example contract
+
+Ví dụ có command, config, script hoặc protocol không được dừng ở đoạn code. Reader-facing example phải cho thấy đủ chuỗi:
+
+- Problem và input/initial state.
+- Command/config/code.
+- Execution flow từng bước.
+- Intermediate state nếu có.
+- Output/final result.
+- Vì sao result xuất hiện.
+- Common failure và debugging evidence.
+
+Với protocol/networking, thêm topology ban đầu, message exchange và database/table trung gian. Với program, thêm input, internal trace và state change.
+
 ## 8. Language
 
 - Giải thích: tiếng Việt tự nhiên.
@@ -109,6 +139,9 @@ Trước khi publish một Volume PDF:
 - page number liên tục;
 - bookmark hoạt động;
 - render thử cover, TOC, chapter opener, diagram-heavy page và lab page;
+- inspect HTML trước, rồi inspect PDF export của cùng artifact;
+- kiểm tra inline SVG/CSS diagram không overlap, không phụ thuộc spacing và label không rời khỏi shape/arrow;
+- kiểm tra mỗi worked example có input → execution trace → intermediate state → output/result → explanation → failure/debugging evidence;
 - visual inspection bắt buộc trước publication.
 
 **Nguyên tắc cuối:** reader nhìn thấy kiến thức; repository giữ quy trình tạo ra kiến thức.

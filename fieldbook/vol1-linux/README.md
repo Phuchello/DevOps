@@ -33,4 +33,10 @@ Mỗi chapter đi từ trực giác → cơ chế → experiment → debugging �
 - `releases/` — bản đọc HTML/PDF.
 - `FROZEN_SOURCES.sha256` — integrity manifest của learner source đã khóa.
 
+## HTML-first proof
+
+Chapter 02 có một proof artifact được build theo pipeline thật: [canonical Markdown parts](chapters/02-streams-pipes-redirection/) → [semantic HTML](releases/chapter02-html-first/chapter02.html) → [PDF exported from that HTML](releases/chapter02-html-first/chapter02.pdf). Renderer chuyển các technical diagram legacy sang inline SVG có geometry, title/description và arrow labels anchored; reader-quality gate fail-closed nếu diagram quay lại dạng ASCII/spacing.
+
+Build và QA rules nằm tại [`build/README.md`](build/README.md). Chạy `node build/build-chapter02-html-first.mjs` từ thư mục Volume để tái tạo proof và chạy các gate trước/sau PDF export.
+
 Chi tiết về review, versioning và quy trình authoring nằm trong `docs/` ở root repository, không chen vào nội dung của sách.

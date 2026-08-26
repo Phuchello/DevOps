@@ -1,0 +1,22 @@
+{
+  "artifactOrder": [
+    "canonical learner Markdown",
+    "chapter HTML",
+    "chapter PDF exported from HTML"
+  ],
+  "sourceFiles": [
+    "fieldbook/vol1-linux/chapters/02-streams-pipes-redirection/part-01.md",
+    "fieldbook/vol1-linux/chapters/02-streams-pipes-redirection/part-02.md"
+  ],
+  "artifacts": [
+    "fieldbook/vol1-linux/releases/chapter02-html-first/chapter02.html",
+    "fieldbook/vol1-linux/releases/chapter02-html-first/chapter02.pdf"
+  ],
+  "legacyDiagramHandling": "Frozen Figure 2.3, 2.4 and 2.5 source blocks are replaced at the HTML boundary by accessible inline SVG; no ASCII diagram enters HTML/PDF.",
+  "pdfPages": 11,
+  "automatedGates": [
+    "check-reader-quality.mjs before PDF export",
+    "check-reader-quality.mjs after PDF export"
+  ],
+  "visualQa": "Inspect generated HTML, a diagram-heavy PDF page, and an example/lab-heavy PDF page before publication."
+}

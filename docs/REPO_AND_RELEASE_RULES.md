@@ -2,11 +2,13 @@
 
 ## 1. Một source of truth
 
-Canonical learner content = Markdown.
+Canonical learner content = Markdown. HTML là reader layout artifact chính; PDF là derivative export từ HTML.
 
 ```text
-Markdown → Semantic HTML → shared stylesheet → HTML + PDF
+Markdown → Semantic HTML + inline SVG/CSS diagrams → PDF exported from that HTML
 ```
+
+Reader artifacts phải được build theo thứ tự này, rồi chạy structural/visual QA trên cả HTML và PDF. Không được sửa PDF riêng để bù cho lỗi trong HTML.
 
 ## 2. Report không phải truth
 
@@ -48,6 +50,10 @@ Khi APPROVED + FROZEN: lưu SHA256 canonical Markdown; chapter sau không đư�
 - heading không orphan;
 - screenshot filename đúng nội dung;
 - PDF phải render/visual inspect, không chỉ tin build exit code 0.
+- diagrams không được là ASCII art hoặc topology dựa vào spacing;
+- SVG phải có `viewBox`, accessible title/description và explicit geometry;
+- worked examples phải có input → execution trace → intermediate state → output/result → explanation → failure/debugging evidence;
+- build phải abort với exit code khác 0 nếu reader-quality gate fail.
 
 ## 6. Incidents tạo ra rule này
 

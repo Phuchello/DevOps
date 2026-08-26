@@ -61,6 +61,8 @@ Fieldbook được viết theo nhịp:
 Mental Model → Mechanism → Experiment → Failure → Debugging → Production → Recall → Lab
 ```
 
+Reader artifacts follow the HTML-first → PDF-second pipeline: canonical Markdown is rendered to semantic HTML first, then the PDF is exported from that HTML. The reader/build rules are documented in [`docs/BOOK_READER_DESIGN_STANDARD.md`](docs/BOOK_READER_DESIGN_STANDARD.md) and [`fieldbook/vol1-linux/build/README.md`](fieldbook/vol1-linux/build/README.md).
+
 ## Nguồn và hiring intelligence
 
 Tài liệu ưu tiên official documentation, man pages, standards và curriculum uy tín cho technical truth; job descriptions và interview/community signals được dùng để tìm competency, failure pattern và điểm thường bị hỏi sâu.
