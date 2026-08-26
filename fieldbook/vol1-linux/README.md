@@ -1,27 +1,36 @@
 # Volume 1 — Linux Systems & Operations
 
-Volume 1 xây Linux mental model và operational troubleshooting foundation trước Docker/Kubernetes.
+**Biên soạn: Võ Trọng Phúc**
 
-## Approved learner chapters
+Volume 1 xây mental model Linux và nền tảng operational troubleshooting trước khi đi sang containers, CI/CD và orchestration.
 
-1. [Chapter 00 — Linux Mental Model](chapters/00-linux-mental-model/) — **9/10 APPROVED + FROZEN**
-2. [Chapter 01 — Filesystem Namespace](chapters/01-filesystem-namespace/) — **~9/10 APPROVED + FROZEN**
-3. [Chapter 02 — Streams, Pipes & Redirection](chapters/02-streams-pipes-redirection/) — **9.2/10 APPROVED + FROZEN**
-4. [Chapter 03 — Search, Transform & Inspect](chapters/03-search-transform/) — **~9.1/10 APPROVED + FROZEN**
+## Nội dung hiện có
 
-Public GitHub import giữ source theo nhiều `part-XX.md` để review/upload nhẹ; README trong từng chapter ghi thứ tự đọc và SHA256 của approved canonical snapshot.
+1. [Chapter 00 — Linux Mental Model](chapters/00-linux-mental-model/)
+2. [Chapter 01 — Files, Names & Locations](chapters/01-filesystem-namespace/)
+3. [Chapter 02 — Streams, Pipes & Redirection](chapters/02-streams-pipes-redirection/)
+4. [Chapter 03 — Search, Transform & Inspect](chapters/03-search-transform/)
 
-## Learning rule
+Mỗi chapter đi từ trực giác → cơ chế → experiment → debugging → ứng dụng DevOps → recall/lab. Các thuật ngữ kỹ thuật chuẩn được giữ bằng English để quen với documentation và môi trường làm việc thực tế.
 
-Không đọc như truyện:
+## Cách học ngắn gọn
 
 ```text
-Predict → Read → Close book → Explain → Run experiment → Record observation → Debug if needed
+Đọc một section nhỏ
+→ đóng tài liệu và tự kể lại
+→ chạy experiment thật
+→ ghi observation
+→ sai thì tìm root cause
+→ quay lại giải thích bằng lời của mình
 ```
 
-Mentor notes/solutions không publish cạnh learner lab nếu làm spoil failure exercise.
+Đừng học command như một danh sách phải thuộc. Hãy hỏi trước: **“Tôi đang cần evidence gì và command này chứng minh được điều gì?”**
 
-## Current state
+## Cấu trúc thư mục
 
-- Learner: Chapter 00 + Ubuntu baseline lab.
-- Authoring: Chapter 04 is the next authoring target.
+- `chapters/` — learner source theo từng chapter.
+- `labs/` — lab dành cho người học; không đặt mentor solution cạnh bài tập.
+- `releases/` — bản đọc HTML/PDF.
+- `FROZEN_SOURCES.sha256` — integrity manifest của learner source đã khóa.
+
+Chi tiết về review, versioning và quy trình authoring nằm trong `docs/` ở root repository, không chen vào nội dung của sách.
