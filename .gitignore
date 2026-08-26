@@ -1,0 +1,17 @@
+# Local / generated workspace noise
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Build scratch directories
+.tmp-*/
+build/.tmp-*/
+build/screenshots*/
+
+# Whole-workspace archives are not canonical releases
+DEVOPS*.zip
+
+# IDE
+.vscode/
+.idea/
