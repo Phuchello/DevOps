@@ -1,35 +1,34 @@
 # DevOps Journey — From Fundamentals to Internship-Ready
 
-> Hành trình học DevOps theo nguyên tắc: **hiểu thật, làm thật, tự debug được, rồi mới dùng AI để review và đóng gói**.
+> **Học cho hiểu hệ thống. Làm để tạo evidence. Sai thì debug đến tận gốc.**
 
-Repository này không phải một bộ sưu tập tutorial, cũng không phải một project “ôm hết mọi thứ” được vibe-code bằng agent. Đây là **learning system + engineering evidence system** được xây dựng để biến từng kỹ năng DevOps thành năng lực có thể giải thích, thực hành, troubleshoot và bảo vệ trước câu hỏi phỏng vấn.
+Repository này ghi lại hành trình xây nền tảng DevOps theo hướng Network → DevOps → Platform/SRE. Mục tiêu không phải sưu tập thật nhiều tool hay tạo một project khổng lồ, mà là biến từng năng lực thành thứ có thể **giải thích, thực hành, troubleshoot và chứng minh bằng hệ thống thật**.
 
-## Mục tiêu
+## Mục tiêu 6 tháng
 
-Mục tiêu 6 tháng đầu không phải “master DevOps”, mà là đạt mức **DevOps Intern Ready+**:
+Mốc đầu tiên là đạt mức **DevOps Intern Ready+**:
 
 - Linux và networking đủ chắc để tự điều tra sự cố cơ bản.
-- Biết Bash/Python automation ở mức thực dụng.
-- Biết containerization, CI/CD, cloud, IaC, Kubernetes và observability theo đúng thứ tự nền tảng.
-- Không học tool theo kiểu thuộc command/YAML.
-- Có portfolio dạng **mỗi project = bằng chứng cho một competency**.
-- Có một capstone production-like sau khi các kỹ năng thành phần đã được chứng minh riêng.
+- Bash/Python automation ở mức thực dụng.
+- Container, CI/CD, cloud, IaC, Kubernetes và observability theo đúng thứ tự nền tảng.
+- Mỗi project chứng minh một competency rõ ràng.
+- Sau cùng mới ghép các competency thành một capstone production-like.
 
-## Triết lý cốt lõi
+## Cách học
 
 ```text
 Hiểu → Tự nhớ lại → Làm → Sai → Sửa → Ôn cách quãng
 ```
 
-Trong DevOps:
+Trong lab:
 
 ```text
 Learn → Build → Break → Debug → Explain → Rebuild → Evidence
 ```
 
-**Một project chạy được chưa đồng nghĩa với biết DevOps.** Skill chỉ được tính khi có thể giải thích mental model, thao tác độc lập, nhận diện failure mode và debug bằng evidence.
+Một command chạy được chưa chứng minh bạn hiểu hệ thống. Một skill chỉ được tính khi bạn biết **vì sao nó hoạt động, failure nằm ở layer nào, evidence nào cần xem và cách phục hồi khi nó hỏng**.
 
-## Roadmap 6 tháng
+## Roadmap
 
 | Phase | Trọng tâm | Project bằng chứng |
 |---|---|---|
@@ -43,49 +42,28 @@ Learn → Build → Break → Debug → Explain → Rebuild → Evidence
 
 Chi tiết: [`docs/ROADMAP_6_MONTHS.md`](docs/ROADMAP_6_MONTHS.md)
 
-## AI/Agent được dùng như thế nào?
-
-AI **không phải builder chính** trong quá trình học. Vai trò hợp lệ: reviewer, examiner, research assistant, source aggregator, failure-scenario generator, technical editor và layout/packaging assistant.
-
-Core implementation, lab, troubleshooting path và explanation phải do người học tự thực hiện trước. Xem [`docs/AGENT_POLICY.md`](docs/AGENT_POLICY.md).
-
 ## DevOps Engineering Fieldbook
 
-Mỗi phase có một volume riêng. Fieldbook không chỉ có theory mà phải có:
+Mỗi phase có một volume riêng. **Volume 1 — Linux Systems & Operations** hiện gồm:
+
+| Chapter | Chủ đề |
+|---|---|
+| 00 | Linux Mental Model |
+| 01 | Files, Names & Locations |
+| 02 | Streams, Pipes & Redirection |
+| 03 | Search, Transform & Inspect |
+
+Đọc source và tài liệu của Volume 1 tại [`fieldbook/vol1-linux/`](fieldbook/vol1-linux/).
+
+Fieldbook được viết theo nhịp:
 
 ```text
-Mental Model
-→ Mechanism
-→ Example
-→ Experiment
-→ Failure
-→ Debugging
-→ Production Relevance
-→ Hiring Deep Dive
-→ Recall
-→ Lab
+Mental Model → Mechanism → Experiment → Failure → Debugging → Production → Recall → Lab
 ```
 
-### Volume 1 — Linux Systems & Operations
+## Nguồn và hiring intelligence
 
-| Chapter | Trạng thái |
-|---|---|
-| 00 — Linux Mental Model | ✅ Approved + Frozen |
-| 01 — Filesystem Namespace | ✅ Approved + Frozen |
-| 02 — Streams, Pipes & Redirection | ✅ Approved + Frozen |
-| 03 — Search, Transform & Inspect | ✅ Approved + Frozen |
-| 04 | 🟡 Next authoring target |
-
-Canonical learner sources được publish tại [`fieldbook/vol1-linux/`](fieldbook/vol1-linux/).
-
-## Hiring Intelligence
-
-Giáo trình không học theo “tiếng ồn Internet”. Nguồn được chia tầng:
-
-1. **Technical truth** — official documentation, man pages, standards.
-2. **Curriculum/competency maps** — Linux Foundation, LFCS, RHCSA và curriculum uy tín.
-3. **Hiring signals** — DevOps/SRE Intern & Junior JDs.
-4. **Community/interview signals** — tìm câu hỏi, failure pattern và điểm hay bị xoáy; không dùng làm technical authority.
+Tài liệu ưu tiên official documentation, man pages, standards và curriculum uy tín cho technical truth; job descriptions và interview/community signals được dùng để tìm competency, failure pattern và điểm thường bị hỏi sâu.
 
 Chi tiết: [`docs/SOURCE_AND_HIRING_INTELLIGENCE.md`](docs/SOURCE_AND_HIRING_INTELLIGENCE.md)
 
@@ -96,18 +74,17 @@ Chi tiết: [`docs/SOURCE_AND_HIRING_INTELLIGENCE.md`](docs/SOURCE_AND_HIRING_IN
 ├── README.md
 ├── PROJECT_STATE.md
 ├── docs/
-├── fieldbook/vol1-linux/
-└── project/
+└── fieldbook/
+    └── vol1-linux/
 ```
+
+Các quy tắc authoring, review, tooling và lịch sử quyết định vẫn được lưu trong `docs/`; chúng không được đưa vào phần nội dung đọc của cuốn sách.
 
 ## Luật vàng
 
-> **Report xanh không có nghĩa system thật sự đúng. Filesystem, command output, logs và artifact thực tế mới là evidence.**
-
-Bài học này đã xuất hiện nhiều lần trong chính quá trình xây Fieldbook và được giữ lại trong [`docs/JOURNEY_LOG.md`](docs/JOURNEY_LOG.md).
+> **Report xanh không đồng nghĩa system đúng. Command output, logs, filesystem state và artifact thật mới là evidence.**
 
 ---
 
-**Status snapshot:** 2026-08-26  
 **Direction:** Network → DevOps → Platform/SRE  
-**Method:** Fundamentals first, evidence first, AI second.
+**Method:** Fundamentals first · Evidence first · Build and debug for real
