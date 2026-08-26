@@ -216,3 +216,9 @@ Hành trình này không chỉ tạo tài liệu DevOps. Chính các lỗi trong
 - small validated increments tốt hơn big unverified output.
 
 Đó cũng chính là triết lý nghề nghiệp mà repository này muốn chứng minh.
+
+## 19. Chapter 03 — approved review candidate
+
+Chapter 03 first scored approximately **8.4/10 — REVISE**. The review found that `uniq -c` compares complete adjacent lines, so timestamps prevented the intended semantic event count. The correction extracts the service field before counting. The revision also added reviewed grep-vs-find and stdin-to-xargs diagrams, cleaned stale Chapter 03 screenshots, and reached approximately **9.1/10 — APPROVED**.
+
+Lesson: tool output semantics must be tested against the actual fixture, not inferred from the desired summary.
