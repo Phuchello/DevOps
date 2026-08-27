@@ -9,33 +9,10 @@
 <body>
   <nav class="screen-nav" aria-label="Book navigation"><span>DevOps Engineering Fieldbook</span><span>Volume 1 - Linux Systems &amp; Operations</span></nav>
   <main class="book-shell">
-    <section class="cover" id="cover"><div class="cover-kicker">VOLUME 1</div><h1>DevOps Engineering Fieldbook</h1><p class="cover-volume">Linux Systems &amp; Operations</p><p class="cover-subtitle">Streams, Pipes &amp; Redirection</p><div class="cover-rule"></div><p class="cover-audience">A beginner-first lesson in where command input and output travel.</p></section>
-    <section class="toc" id="table-of-contents"><p class="eyebrow">CONTENTS</p><h2>Chapter 02 - Streams, Pipes &amp; Redirection</h2><div class="toc-list"><a class="toc-entry" href="#section-2-1-mot-cau-hoi-on-gian-output-cua-command-i-au"><span class="toc-label">2.1 Một câu hỏi đơn giản: output của command đi đâu?</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-2-hieu-input-va-output-truoc-khi-hoc-thuat-ngu"><span class="toc-label">2.2 Hiểu input và output trước khi học thuật ngữ</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-3-standard-input-stdin"><span class="toc-label">2.3 Standard Input (stdin)</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-4-standard-output-stdout"><span class="toc-label">2.4 Standard Output - stdout</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-5-standard-error-stderr"><span class="toc-label">2.5 Standard Error - stderr</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-6-file-descriptors-0-1-and-2"><span class="toc-label">2.6 File descriptors 0, 1, and 2</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-7-output-redirection"><span class="toc-label">2.7 Output redirection: &gt;</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-8-append-redirection"><span class="toc-label">2.8 Append redirection: &gt;&gt;</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-9-input-redirection"><span class="toc-label">2.9 Input redirection: &lt;</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-10-stderr-redirection-2"><span class="toc-label">2.10 stderr redirection: 2&gt;</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-11-gop-stdout-va-stderr"><span class="toc-label">2.11 Gộp stdout và stderr</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-12-pipes"><span class="toc-label">2.12 Pipes: |</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-13-vi-sao-pipe-khong-phai-temporary-file"><span class="toc-label">2.13 Vì sao pipe không phải temporary file?</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-14-exit-status-khac-error-output-the-nao"><span class="toc-label">2.14 Exit status khác error output thế nào?</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-15-nhung-loi-thuong-gap-va-cach-debugging"><span class="toc-label">2.15 Những lỗi thường gặp và cách debugging</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-16-stop-recall"><span class="toc-label">2.16 STOP &amp; RECALL</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-17-bai-lab-co-huong-dan"><span class="toc-label">2.17 Bài lab có hướng dẫn</span><span class="toc-page">—</span></a><a class="toc-entry" href="#section-2-18-iem-kiem-tra-cuoi-chapter"><span class="toc-label">2.18 Điểm kiểm tra cuối chapter</span><span class="toc-page">—</span></a></div></section>
-    <section class="chapter-header" id="chapter-02"><p class="eyebrow">CHAPTER 02</p><h1>Streams, Pipes &amp; Redirection</h1><p class="chapter-dek">Follow text as it enters a command, leaves it and becomes evidence.</p><div class="chapter-tags"><span>CORE</span><span>HANDS-ON</span><span>PRODUCTION</span></div></section>
-    <article class="chapter-content">
-<section class="worked-example" id="worked-example-stream-routing">
-  <p class="eyebrow">WORKED EXAMPLE</p>
-  <h2>Luồng thực thi đầy đủ: tách stdout và stderr</h2>
-  <div class="example-flow">
-    <p><strong>Problem.</strong> Muốn giữ normal output và diagnostic output thành hai evidence file để đọc riêng.</p>
-    <p><strong>Input / initial state.</strong> Thư mục lab có <code class="inline-code">colors.txt</code>; <code class="inline-code">does-not-exist.txt</code> chưa tồn tại.</p>
-    <p><strong>Command.</strong></p>
-    <pre><code>ls colors.txt does-not-exist.txt &gt; normal.txt 2&gt; errors.txt</code></pre>
-    <p><strong>Execution flow.</strong> Shell mở hai destination trước khi command chạy → <code class="inline-code">ls</code> ghi tên file có thật qua stdout → <code class="inline-code">ls</code> ghi diagnostic cho file thiếu qua stderr.</p>
-    <p><strong>Intermediate state.</strong> <code class="inline-code">normal.txt</code> đã nhận một dòng; <code class="inline-code">errors.txt</code> đã nhận diagnostic, dù command chỉ chạy một lần.</p>
-  </div>
-  <div class="example-result">
-    <p><strong>Output / result.</strong></p>
-    <pre><code>$ cat normal.txt
-colors.txt
-$ cat errors.txt
-ls: cannot access 'does-not-exist.txt': No such file or directory</code></pre>
-    <p><strong>Why.</strong> <code class="inline-code">&gt;</code> đổi destination của stdout; <code class="inline-code">2&gt;</code> đổi destination của descriptor 2, tức stderr. Hai stream vẫn riêng.</p>
-  </div>
-  <div class="example-failure"><p><strong>Common failure.</strong> Dùng <code class="inline-code">&gt; combined.txt</code> rồi ngạc nhiên khi diagnostic vẫn hiện trên terminal.</p></div>
-  <div class="example-debug"><p><strong>Debugging evidence.</strong> Chạy <code class="inline-code">cat normal.txt</code>, <code class="inline-code">cat errors.txt</code>, rồi kiểm tra exit status ngay sau command. Đừng suy ra routing từ việc text cùng xuất hiện trên một terminal.</p></div>
-</section><p>Tags: <code class="inline-code">[BEGINNER]</code> <code class="inline-code">[CORE]</code> <code class="inline-code">[HANDS-ON]</code> <code class="inline-code">[PRODUCTION]</code></p>
-<h2 id="section-2-1-mot-cau-hoi-on-gian-output-cua-command-i-au">2.1 Một câu hỏi đơn giản: output của command đi đâu?</h2><p>Mở terminal và chạy một command rất nhỏ:</p>
+    <section class="cover" id="cover"><div class="cover-kicker">VOLUME 1</div><h1>DevOps Engineering Fieldbook</h1><p class="cover-volume">Linux Systems &amp; Operations</p><p class="cover-subtitle">Streams, Pipes &amp; Redirection</p><div class="cover-rule"></div><p class="cover-audience">A beginner-first lesson in where command input and output travel.</p><p class="cover-meta">BIÊN SOẠN: VÕ TRỌNG PHÚC</p></section>
+    <section class="toc" id="table-of-contents"><p class="eyebrow">CONTENTS</p><h2>Chapter 02 - Streams, Pipes &amp; Redirection</h2><div class="toc-list"><a class="toc-entry" href="#section-2-1-mot-cau-hoi-on-gian-output-cua-command-i-au"><span class="toc-label">2.1 Một câu hỏi đơn giản: output của command đi đâu?</span><span class="toc-page">3</span></a><a class="toc-entry" href="#section-2-2-hieu-input-va-output-truoc-khi-hoc-thuat-ngu"><span class="toc-label">2.2 Hiểu input và output trước khi học thuật ngữ</span><span class="toc-page">3</span></a><a class="toc-entry" href="#section-2-3-standard-input-stdin"><span class="toc-label">2.3 Standard Input (stdin)</span><span class="toc-page">4</span></a><a class="toc-entry" href="#section-2-4-standard-output-stdout"><span class="toc-label">2.4 Standard Output - stdout</span><span class="toc-page">4</span></a><a class="toc-entry" href="#section-2-5-standard-error-stderr"><span class="toc-label">2.5 Standard Error - stderr</span><span class="toc-page">5</span></a><a class="toc-entry" href="#section-2-6-file-descriptors-0-1-and-2"><span class="toc-label">2.6 File descriptors 0, 1, and 2</span><span class="toc-page">6</span></a><a class="toc-entry" href="#section-2-7-output-redirection"><span class="toc-label">2.7 Output redirection: &gt;</span><span class="toc-page">6</span></a><a class="toc-entry" href="#section-2-8-append-redirection"><span class="toc-label">2.8 Append redirection: &gt;&gt;</span><span class="toc-page">6</span></a><a class="toc-entry" href="#section-2-9-input-redirection"><span class="toc-label">2.9 Input redirection: &lt;</span><span class="toc-page">7</span></a><a class="toc-entry" href="#section-2-10-stderr-redirection-2"><span class="toc-label">2.10 stderr redirection: 2&gt;</span><span class="toc-page">7</span></a><a class="toc-entry" href="#section-2-11-gop-stdout-va-stderr"><span class="toc-label">2.11 Gộp stdout và stderr</span><span class="toc-page">8</span></a><a class="toc-entry" href="#section-2-12-pipes"><span class="toc-label">2.12 Pipes: |</span><span class="toc-page">9</span></a><a class="toc-entry" href="#section-2-13-vi-sao-pipe-khong-phai-temporary-file"><span class="toc-label">2.13 Vì sao pipe không phải temporary file?</span><span class="toc-page">9</span></a><a class="toc-entry" href="#section-2-14-exit-status-khac-error-output-the-nao"><span class="toc-label">2.14 Exit status khác error output thế nào?</span><span class="toc-page">9</span></a><a class="toc-entry" href="#section-2-15-nhung-loi-thuong-gap-va-cach-debugging"><span class="toc-label">2.15 Những lỗi thường gặp và cách debugging</span><span class="toc-page">10</span></a><a class="toc-entry" href="#section-2-16-stop-recall"><span class="toc-label">2.16 STOP &amp; RECALL</span><span class="toc-page">10</span></a><a class="toc-entry" href="#section-2-17-bai-lab-co-huong-dan"><span class="toc-label">2.17 Bài lab có hướng dẫn</span><span class="toc-page">11</span></a><a class="toc-entry" href="#section-2-18-iem-kiem-tra-cuoi-chapter"><span class="toc-label">2.18 Điểm kiểm tra cuối chapter</span><span class="toc-page">11</span></a></div></section>
+    <section class="chapter-header" id="chapter-02"><p class="eyebrow">CHAPTER 02</p><h1>Streams, Pipes &amp; Redirection</h1><p class="chapter-dek">Follow text as it enters a command, leaves it and becomes evidence.</p></section>
+    <article class="chapter-content"><h2 id="section-2-1-mot-cau-hoi-on-gian-output-cua-command-i-au">2.1 Một câu hỏi đơn giản: output của command đi đâu?</h2><p>Mở terminal và chạy một command rất nhỏ:</p>
 <figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">printf &#39;hello from the terminal\n&#39;</code></pre></figure><p>Bạn thấy một dòng trên màn hình. Nhưng dòng đó đã đi đâu trước khi bạn nhìn thấy nó? Command có luôn phải hiện kết quả trên terminal không, hay ta có thể gửi cùng kết quả vào file?</p>
 <p>Hãy làm trong một lab directory có thể bỏ đi:</p>
 <figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">mkdir -p &quot;$HOME/fieldbook-labs/ch02-streams&quot;
@@ -153,6 +130,29 @@ cat errors.txt</code></pre></figure><p><code class="inline-code">ls</code> xử 
   <figcaption>Figure 2.4 - <code>command &gt;normal.txt 2&gt;errors.txt</code> giữ hai stream thành hai evidence file.</figcaption>
 </figure>
 
+
+<section class="worked-example" id="worked-example-stream-routing">
+  <p class="eyebrow">WORKED EXAMPLE</p>
+  <h2>Luồng thực thi đầy đủ: tách stdout và stderr</h2>
+  <div class="example-flow">
+    <p><strong>Problem.</strong> Muốn giữ normal output và diagnostic output thành hai evidence file để đọc riêng.</p>
+    <p><strong>Input / initial state.</strong> Thư mục lab có <code class="inline-code">colors.txt</code>; <code class="inline-code">does-not-exist.txt</code> chưa tồn tại.</p>
+    <p><strong>Command.</strong></p>
+    <pre><code>ls colors.txt does-not-exist.txt &gt; normal.txt 2&gt; errors.txt</code></pre>
+    <p><strong>Execution flow.</strong> Shell mở hai destination trước khi command chạy → <code class="inline-code">ls</code> ghi tên file có thật qua stdout → <code class="inline-code">ls</code> ghi diagnostic cho file thiếu qua stderr.</p>
+    <p><strong>Intermediate state.</strong> <code class="inline-code">normal.txt</code> đã nhận một dòng; <code class="inline-code">errors.txt</code> đã nhận diagnostic, dù command chỉ chạy một lần.</p>
+  </div>
+  <div class="example-result">
+    <p><strong>Output / result.</strong></p>
+    <pre><code>$ cat normal.txt
+colors.txt
+$ cat errors.txt
+ls: cannot access 'does-not-exist.txt': No such file or directory</code></pre>
+    <p><strong>Why.</strong> <code class="inline-code">&gt;</code> đổi destination của stdout; <code class="inline-code">2&gt;</code> đổi destination của descriptor 2, tức stderr. Hai stream vẫn riêng.</p>
+  </div>
+  <div class="example-failure"><p><strong>Common failure.</strong> Dùng <code class="inline-code">&gt; combined.txt</code> rồi ngạc nhiên khi diagnostic vẫn hiện trên terminal.</p></div>
+  <div class="example-debug"><p><strong>Debugging evidence.</strong> Chạy <code class="inline-code">cat normal.txt</code>, <code class="inline-code">cat errors.txt</code>, rồi kiểm tra exit status ngay sau command. Đừng suy ra routing từ việc text cùng xuất hiện trên một terminal.</p></div>
+</section>
 <h2 id="section-2-11-gop-stdout-va-stderr">2.11 Gộp stdout và stderr</h2><p>Khi cần một transcript chung, <code class="inline-code">2&gt;&amp;1</code> có nghĩa “đưa stderr (descriptor 2) tới destination hiện tại của stdout (descriptor 1).” Shell đọc redirection từ trái sang phải.</p>
 <figure class="code-figure code-command"><div class="code-label">Command</div><pre><code class="language-bash">ls colors.txt does-not-exist.txt &gt; combined.txt 2&gt;&amp;1
 cat combined.txt</code></pre></figure><p>Ở đây stdout đổi sang <code class="inline-code">combined.txt</code> trước; sau đó stderr theo destination hiện tại của stdout. So sánh:</p>
@@ -284,6 +284,6 @@ Vẽ đường đi cho <code>producer &gt;out.txt 2&gt;err.txt</code>, rồi nó
 <p class="small"><strong>DevOps connection:</strong> Stream reasoning giúp bạn redirect command output vào log đúng mục đích, giữ error output riêng, chain diagnostic commands, và không nhầm pipeline output với bằng chứng mọi stage đã thành công.</p>
 </article>
   </main>
-  <div class="screen-footer">Volume 1 - Linux Systems &amp; Operations <span>Chapter 02</span></div>
+  <div class="screen-footer">Chapter 02 · Streams, Pipes &amp; Redirection</div>
 </body>
 </html>

@@ -14,14 +14,26 @@ const pdfPath = path.join(outputRoot, 'chapter02.pdf');
 const reportPath = path.join(outputRoot, 'BUILD_REPORT.json');
 const sourcePaths = [path.join(chapterRoot, 'part-01.md'), path.join(chapterRoot, 'part-02.md')];
 
-const runtimeNodeModules = process.env.FIELD_BOOK_NODE_MODULES
-  || path.join('C:', 'Users', 'lyle3', '.cache', 'codex-runtimes', 'codex-primary-runtime', 'dependencies', 'node', 'node_modules');
-const markedEntry = path.join(runtimeNodeModules, 'marked', 'lib', 'marked.esm.js');
-if (!fs.existsSync(markedEntry)) throw new Error(`marked runtime not found: ${markedEntry}`);
-const { marked } = await import(pathToFileURL(markedEntry).href);
-const require = createRequire(import.meta.url);
-const { chromium } = require(path.join(runtimeNodeModules, 'playwright'));
-const { PDFDocument, StandardFonts, rgb } = require(path.join(runtimeNodeModules, 'pdf-lib'));
+const buildMode = process.argv.find((argument) => argument.startsWith('--mode='))?.slice('--mode='.length) || 'standalone';
+if (!['standalone', 'volume'].includes(buildMode)) throw new Error(`Unsupported build mode: ${buildMode}`);
+
+const requireFromVolume = createRequire(path.join(volumeRoot, 'package.json'));
+const dependencyLookupPaths = [volumeRoot];
+if (process.env.FIELD_BOOK_NODE_MODULES) dependencyLookupPaths.unshift(process.env.FIELD_BOOK_NODE_MODULES);
+const resolveDependency = (packageName) => {
+  try {
+    return requireFromVolume.resolve(packageName, { paths: dependencyLookupPaths });
+  } catch {
+    throw new Error(`Missing dependency "${packageName}". Run npm ci in fieldbook/vol1-linux, or set FIELD_BOOK_NODE_MODULES as an optional override.`);
+  }
+};
+const markedEntry = resolveDependency('marked');
+const markedModule = await import(pathToFileURL(markedEntry).href);
+const marked = markedModule.marked ?? markedModule.default?.marked ?? markedModule.default;
+if (!marked?.Renderer || !marked?.parse) throw new Error(`Could not load marked from project dependency: ${markedEntry}`);
+const { chromium } = requireFromVolume(resolveDependency('playwright'));
+const { PDFDocument, StandardFonts, rgb } = requireFromVolume(resolveDependency('pdf-lib'));
+const { getDocument } = await import(pathToFileURL(resolveDependency('pdfjs-dist/legacy/build/pdf.mjs')).href);
 
 const escapeHtml = (value) => String(value)
   .replaceAll('&', '&amp;')
@@ -107,14 +119,10 @@ for (const sourcePath of sourcePaths) if (!fs.existsSync(sourcePath)) throw new 
 execFileSync(process.execPath, [path.join(volumeRoot, 'check-frozen-sources.mjs')], { cwd: repoRoot, stdio: 'inherit' });
 const rawSource = sourcePaths.map((sourcePath) => fs.readFileSync(sourcePath, 'utf8')).join('\n');
 const sourceWithSvg = replaceLegacyFigures(rawSource)
-  .replace(/^#\s+Chapter\s+02[^\n]*\n+/iu, '')
-  .replace(/^Tags:[^\n]*\n+/u, '');
+  .replace(/^#\s+Chapter\s+02[^\r\n]*\r?\n?/gimu, '')
+  .replace(/^Tags:[^\r\n]*\r?\n?/gimu, '');
 const headings = [...sourceWithSvg.matchAll(/^##\s+(.+)$/gmi)].map((match) => match[1].trim());
 const bodyHtml = marked.parse(sourceWithSvg, { renderer, gfm: true, breaks: false, headerIds: false, mangle: false });
-const toc = headings.map((heading) => {
-  const tocText = heading.replaceAll('`', '');
-  return `<a class="toc-entry" href="#section-${slugify(heading)}"><span class="toc-label">${escapeHtml(tocText)}</span><span class="toc-page">—</span></a>`;
-}).join('');
 
 const workedExample = `
 <section class="worked-example" id="worked-example-stream-routing">
@@ -140,7 +148,21 @@ ls: cannot access 'does-not-exist.txt': No such file or directory</code></pre>
   <div class="example-debug"><p><strong>Debugging evidence.</strong> Chạy <code class="inline-code">cat normal.txt</code>, <code class="inline-code">cat errors.txt</code>, rồi kiểm tra exit status ngay sau command. Đừng suy ra routing từ việc text cùng xuất hiện trên một terminal.</p></div>
 </section>`;
 
-const html = `<!doctype html>
+const chapter11Heading = headings.find((heading) => /^2\.11\b/u.test(heading));
+if (!chapter11Heading) throw new Error('Chapter 02 section 2.11 heading was not found');
+const chapter11Marker = `<h2 id="section-${slugify(chapter11Heading)}">`;
+const bodyWithWorkedExample = bodyHtml.replace(chapter11Marker, `${workedExample}\n${chapter11Marker}`);
+if (bodyWithWorkedExample === bodyHtml) throw new Error('Worked example could not be placed after section 2.10');
+
+const buildHtml = (pageMap = null) => {
+  const toc = headings.map((heading) => {
+    const tocText = heading.replaceAll('`', '');
+    const pageNumber = pageMap?.[slugify(heading)];
+    const pageText = Number.isInteger(pageNumber) ? pageNumber : '—';
+    return `<a class="toc-entry" href="#section-${slugify(heading)}"><span class="toc-label">${escapeHtml(tocText)}</span><span class="toc-page">${pageText}</span></a>`;
+  }).join('');
+  const cover = buildMode === 'standalone' ? `<section class="cover" id="cover"><div class="cover-kicker">VOLUME 1</div><h1>DevOps Engineering Fieldbook</h1><p class="cover-volume">Linux Systems &amp; Operations</p><p class="cover-subtitle">Streams, Pipes &amp; Redirection</p><div class="cover-rule"></div><p class="cover-audience">A beginner-first lesson in where command input and output travel.</p><p class="cover-meta">BIÊN SOẠN: VÕ TRỌNG PHÚC</p></section>` : '';
+  return `<!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8">
@@ -151,51 +173,113 @@ const html = `<!doctype html>
 <body>
   <nav class="screen-nav" aria-label="Book navigation"><span>DevOps Engineering Fieldbook</span><span>Volume 1 - Linux Systems &amp; Operations</span></nav>
   <main class="book-shell">
-    <section class="cover" id="cover"><div class="cover-kicker">VOLUME 1</div><h1>DevOps Engineering Fieldbook</h1><p class="cover-volume">Linux Systems &amp; Operations</p><p class="cover-subtitle">Streams, Pipes &amp; Redirection</p><div class="cover-rule"></div><p class="cover-audience">A beginner-first lesson in where command input and output travel.</p></section>
+    ${cover}
     <section class="toc" id="table-of-contents"><p class="eyebrow">CONTENTS</p><h2>Chapter 02 - Streams, Pipes &amp; Redirection</h2><div class="toc-list">${toc}</div></section>
-    <section class="chapter-header" id="chapter-02"><p class="eyebrow">CHAPTER 02</p><h1>Streams, Pipes &amp; Redirection</h1><p class="chapter-dek">Follow text as it enters a command, leaves it and becomes evidence.</p><div class="chapter-tags"><span>CORE</span><span>HANDS-ON</span><span>PRODUCTION</span></div></section>
-    <article class="chapter-content">${workedExample}${bodyHtml}</article>
+    <section class="chapter-header" id="chapter-02"><p class="eyebrow">CHAPTER 02</p><h1>Streams, Pipes &amp; Redirection</h1><p class="chapter-dek">Follow text as it enters a command, leaves it and becomes evidence.</p></section>
+    <article class="chapter-content">${bodyWithWorkedExample}</article>
   </main>
-  <div class="screen-footer">Volume 1 - Linux Systems &amp; Operations <span>Chapter 02</span></div>
+  <div class="screen-footer">Chapter 02 · Streams, Pipes &amp; Redirection</div>
 </body>
 </html>`;
+};
 
 fs.mkdirSync(outputRoot, { recursive: true });
-fs.writeFileSync(htmlPath, html);
+fs.writeFileSync(htmlPath, buildHtml());
 execFileSync(process.execPath, [path.join(buildRoot, 'check-reader-quality.mjs'), '--html-only'], { cwd: repoRoot, stdio: 'inherit' });
 
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1240, height: 900 }, deviceScaleFactor: 1 });
-await page.goto(pathToFileURL(htmlPath).href, { waitUntil: 'load' });
-await page.evaluate(() => document.fonts?.ready);
-await page.emulateMedia({ media: 'print' });
 const intermediatePdf = path.join(outputRoot, '.chapter02-unfooted.pdf');
-await page.pdf({ path: intermediatePdf, format: 'A4', printBackground: true, preferCSSPageSize: true, margin: { top: '0mm', right: '0mm', bottom: '0mm', left: '0mm' } });
-await browser.close();
+const exportPdf = async (targetPath) => {
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1240, height: 900 }, deviceScaleFactor: 1 });
+  await page.goto(pathToFileURL(htmlPath).href, { waitUntil: 'load' });
+  await page.emulateMedia({ media: 'print' });
+  await page.evaluate(() => document.fonts?.ready);
+  await page.pdf({ path: targetPath, format: 'A4', printBackground: true, preferCSSPageSize: true, margin: { top: '0mm', right: '0mm', bottom: '0mm', left: '0mm' } });
+  await browser.close();
+};
+
+const normalizePdfText = (value) => String(value).replaceAll('`', '').replace(/\s+/gu, ' ').trim().toLocaleLowerCase();
+const extractPageMap = async (pdfFile) => {
+  const loadingTask = getDocument({ data: new Uint8Array(fs.readFileSync(pdfFile)), disableWorker: true, useSystemFonts: true });
+  const document = await loadingTask.promise;
+  const pages = [];
+  for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+    const pdfPage = await document.getPage(pageNumber);
+    const content = await pdfPage.getTextContent();
+    pages.push(normalizePdfText(content.items.map((item) => item.str || '').join(' ')));
+    pdfPage.cleanup();
+  }
+  await document.cleanup();
+  const pageMap = {};
+  for (const heading of headings) {
+    const needle = normalizePdfText(heading.replaceAll('`', ''));
+    const matches = pages.map((pageText, index) => pageText.includes(needle) ? index + 1 : null).filter(Number.isInteger);
+    if (matches.length === 0) throw new Error(`Could not locate printed heading in PDF: ${heading}`);
+    pageMap[slugify(heading)] = Math.max(...matches);
+  }
+  return pageMap;
+};
+
+await exportPdf(intermediatePdf);
+let pageMap = await extractPageMap(intermediatePdf);
+fs.writeFileSync(htmlPath, buildHtml(pageMap));
+await exportPdf(intermediatePdf);
+const verifiedPageMap = await extractPageMap(intermediatePdf);
+if (JSON.stringify(verifiedPageMap) !== JSON.stringify(pageMap)) {
+  pageMap = verifiedPageMap;
+  fs.writeFileSync(htmlPath, buildHtml(pageMap));
+  await exportPdf(intermediatePdf);
+  const finalPageMap = await extractPageMap(intermediatePdf);
+  if (JSON.stringify(finalPageMap) !== JSON.stringify(pageMap)) throw new Error('TOC page mapping did not stabilize after PDF export');
+  pageMap = finalPageMap;
+}
+execFileSync(process.execPath, [path.join(buildRoot, 'check-reader-quality.mjs'), '--html-only'], { cwd: repoRoot, stdio: 'inherit' });
 
 const pdf = await PDFDocument.load(fs.readFileSync(intermediatePdf));
 const font = await pdf.embedFont(StandardFonts.Helvetica);
 const totalPages = pdf.getPageCount();
 pdf.getPages().forEach((pdfPage, index) => {
-  if (index === 0) return;
+  if (buildMode === 'standalone' && index === 0) return;
   const { width } = pdfPage.getSize();
   pdfPage.drawLine({ start: { x: 57, y: 47 }, end: { x: width - 48, y: 47 }, thickness: 0.5, color: rgb(0.78, 0.8, 0.82) });
-  pdfPage.drawText(`Volume 1 - Linux Systems & Operations    Page ${index} / ${totalPages - 1}`, { x: 57, y: 31, size: 8, font, color: rgb(0.25, 0.28, 0.31) });
+  pdfPage.drawText(`Chapter 02 · Streams, Pipes & Redirection    ${index + 1}`, { x: 57, y: 31, size: 8, font, color: rgb(0.25, 0.28, 0.31) });
 });
 fs.writeFileSync(pdfPath, await pdf.save());
 fs.rmSync(intermediatePdf, { force: true });
 execFileSync(process.execPath, [path.join(buildRoot, 'check-reader-quality.mjs')], { cwd: repoRoot, stdio: 'inherit' });
 execFileSync(process.execPath, [path.join(volumeRoot, 'check-frozen-sources.mjs')], { cwd: repoRoot, stdio: 'inherit' });
 
+const repoRelative = (file) => path.relative(repoRoot, file).replaceAll(path.sep, '/');
 const report = {
   artifactOrder: ['canonical learner Markdown', 'chapter HTML', 'chapter PDF exported from HTML'],
-  sourceFiles: sourcePaths.map((file) => path.relative(repoRoot, file).replaceAll(path.sep, '/')),
-  artifacts: [path.relative(repoRoot, htmlPath).replaceAll(path.sep, '/'), path.relative(repoRoot, pdfPath).replaceAll(path.sep, '/')],
+  buildMode,
+  dependencyResolution: process.env.FIELD_BOOK_NODE_MODULES ? 'FIELD_BOOK_NODE_MODULES optional override' : 'fieldbook/vol1-linux/node_modules via npm ci',
+  sourceFiles: sourcePaths.map(repoRelative),
+  artifacts: [repoRelative(htmlPath), repoRelative(pdfPath)],
   legacyDiagramHandling: 'Frozen Figure 2.3, 2.4 and 2.5 source blocks are replaced at the HTML boundary by accessible inline SVG; no ASCII diagram enters HTML/PDF.',
   pdfPages: totalPages,
-  automatedGates: ['check-reader-quality.mjs before PDF export', 'check-reader-quality.mjs after PDF export'],
+  automatedGates: ['check-frozen-sources.mjs before render', 'check-reader-quality.mjs before PDF export', 'check-reader-quality.mjs after PDF export', 'check-frozen-sources.mjs after render'],
+  frozenSources: 'FROZEN_SOURCES_OK',
+  readerMetadata: 'absent',
+  workedExamplePlacement: 'after section 2.10 and before section 2.11',
+  tocPagesResolved: true,
+  tocPageMap: pageMap,
+  footer: 'Chapter 02 · Streams, Pipes & Redirection + physical page number; no total-page metadata',
   visualQa: 'Inspect generated HTML, a diagram-heavy PDF page, and an example/lab-heavy PDF page before publication.',
 };
 fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
+const proofPath = path.join(outputRoot, 'REVIEW_PROOF.md');
+fs.writeFileSync(proofPath, `# Chapter 02 HTML-first review proof
+
+- Clean dependency resolution: PASS — project-local \`fieldbook/vol1-linux/node_modules\` selected by normal Node package resolution; no machine-specific fallback.
+- Reader metadata absent: PASS — quality gate rejects Tags, approval/freeze labels, version labels, Study Edition, and the old total-page footer.
+- Worked example placement: PASS — after section 2.10 and before section 2.11, with Problem → Input → Command → Execution flow → Intermediate state → Output → Why → Common failure → Debugging evidence.
+- PDF TOC pages resolved: PASS — calculated by locating each printed heading in the exported PDF text pages: \`${JSON.stringify(pageMap)}\`.
+- Footer: PASS — \`Chapter 02 · Streams, Pipes & Redirection\` plus physical page number; no volume total or build-report metadata.
+- Frozen source check: PASS — \`FROZEN_SOURCES_OK\`; the manifest uses canonical Git UTF-8/LF bytes, including Chapter 03 \`9e59eb4d93f913a4dbf33013b37d2e095e2e24eb0123ea7f9be76f30af6a1882\`.
+- Build command: \`npm run build:chapter02\`.
+
+The prior hash discrepancy was caused by hashing Windows CRLF working-tree checkouts rather than the LF bytes stored in Git. The manifest now records exact Git-byte hashes for Chapters 00–03, and the checker normalizes CRLF to LF before hashing.
+`);
 console.log(JSON.stringify(report, null, 2));
-console.log(`HTML_FIRST_BUILD_OK\nHTML: ${path.relative(repoRoot, htmlPath).replaceAll(path.sep, '/')}\nPDF: ${path.relative(repoRoot, pdfPath).replaceAll(path.sep, '/')}`);
+console.log(`HTML_FIRST_BUILD_OK\nHTML: ${repoRelative(htmlPath)}\nPDF: ${repoRelative(pdfPath)}\nPROOF: ${repoRelative(proofPath)}`);

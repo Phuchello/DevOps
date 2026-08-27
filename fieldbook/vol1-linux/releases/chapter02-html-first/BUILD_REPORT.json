@@ -4,6 +4,8 @@
     "chapter HTML",
     "chapter PDF exported from HTML"
   ],
+  "buildMode": "standalone",
+  "dependencyResolution": "fieldbook/vol1-linux/node_modules via npm ci",
   "sourceFiles": [
     "fieldbook/vol1-linux/chapters/02-streams-pipes-redirection/part-01.md",
     "fieldbook/vol1-linux/chapters/02-streams-pipes-redirection/part-02.md"
@@ -13,10 +15,37 @@
     "fieldbook/vol1-linux/releases/chapter02-html-first/chapter02.pdf"
   ],
   "legacyDiagramHandling": "Frozen Figure 2.3, 2.4 and 2.5 source blocks are replaced at the HTML boundary by accessible inline SVG; no ASCII diagram enters HTML/PDF.",
-  "pdfPages": 11,
+  "pdfPages": 12,
   "automatedGates": [
+    "check-frozen-sources.mjs before render",
     "check-reader-quality.mjs before PDF export",
-    "check-reader-quality.mjs after PDF export"
+    "check-reader-quality.mjs after PDF export",
+    "check-frozen-sources.mjs after render"
   ],
+  "frozenSources": "FROZEN_SOURCES_OK",
+  "readerMetadata": "absent",
+  "workedExamplePlacement": "after section 2.10 and before section 2.11",
+  "tocPagesResolved": true,
+  "tocPageMap": {
+    "2-1-mot-cau-hoi-on-gian-output-cua-command-i-au": 3,
+    "2-2-hieu-input-va-output-truoc-khi-hoc-thuat-ngu": 3,
+    "2-3-standard-input-stdin": 4,
+    "2-4-standard-output-stdout": 4,
+    "2-5-standard-error-stderr": 5,
+    "2-6-file-descriptors-0-1-and-2": 6,
+    "2-7-output-redirection": 6,
+    "2-8-append-redirection": 6,
+    "2-9-input-redirection": 7,
+    "2-10-stderr-redirection-2": 7,
+    "2-11-gop-stdout-va-stderr": 8,
+    "2-12-pipes": 9,
+    "2-13-vi-sao-pipe-khong-phai-temporary-file": 9,
+    "2-14-exit-status-khac-error-output-the-nao": 9,
+    "2-15-nhung-loi-thuong-gap-va-cach-debugging": 10,
+    "2-16-stop-recall": 10,
+    "2-17-bai-lab-co-huong-dan": 11,
+    "2-18-iem-kiem-tra-cuoi-chapter": 11
+  },
+  "footer": "Chapter 02 · Streams, Pipes & Redirection + physical page number; no total-page metadata",
   "visualQa": "Inspect generated HTML, a diagram-heavy PDF page, and an example/lab-heavy PDF page before publication."
 }

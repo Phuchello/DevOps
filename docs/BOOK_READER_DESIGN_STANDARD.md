@@ -23,6 +23,10 @@ Bìa duy nhất phải chứa:
 
 Không lặp lại cover riêng của từng chapter khi ghép Volume.
 
+Builder phải có mode rõ ràng: standalone có thể có một chapter cover; volume
+phải suppress chapter covers và chỉ render một volume cover. Volume cover vẫn
+giữ dòng `BIÊN SOẠN: VÕ TRỌNG PHÚC`.
+
 ## 2. Không đưa metadata quy trình vào reader PDF
 
 Các cụm sau **không xuất hiện trong phần đọc của sách**:

@@ -3,11 +3,13 @@
 *.log
 .DS_Store
 Thumbs.db
+node_modules/
 
 # Build scratch directories
 .tmp-*/
 build/.tmp-*/
 build/screenshots*/
+**/build/screenshots*/
 
 # Whole-workspace archives are not canonical releases
 DEVOPS*.zip

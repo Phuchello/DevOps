@@ -10,6 +10,7 @@
   "devDependencies": {
     "marked": "^15.0.12",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.2.108",
     "playwright": "^1.51.1"
   }
 }

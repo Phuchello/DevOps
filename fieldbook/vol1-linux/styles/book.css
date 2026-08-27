@@ -67,7 +67,7 @@ body {
 .cover-subtitle { margin: 3px 0 0; color: #cce2eb; font-size: 18pt; }
 .cover-rule { width: 92px; height: 4px; margin: 28px 0 18px; background: #d9a33b; }
 .cover-audience { max-width: 540px; margin: 0; font-size: 13pt; color: #eef8fb; }
-.cover-meta { margin-top: auto; color: #315365; font-size: 9.5pt; }
+.cover-meta { margin-top: auto; color: #183241; font-size: 9.5pt; font-weight: 700; }
 
 .front-matter, .toc, .chapter-header, .chapter-content { padding: 28px 58px; }
 .compact-front { background: #f7fafb; }
