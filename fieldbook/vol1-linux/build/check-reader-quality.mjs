@@ -10,6 +10,8 @@ const htmlPath = path.join(proofRoot, 'chapter02.html');
 const pdfPath = path.join(proofRoot, 'chapter02.pdf');
 const cssPath = path.join(volumeRoot, 'styles', 'book.css');
 const htmlOnly = process.argv.includes('--html-only');
+const modeArgument = process.argv.find((argument) => argument.startsWith('--mode='));
+const buildMode = modeArgument?.slice('--mode='.length) || 'standalone';
 const sourceFiles = [
   path.join(volumeRoot, 'chapters', '02-streams-pipes-redirection', 'part-01.md'),
   path.join(volumeRoot, 'chapters', '02-streams-pipes-redirection', 'part-02.md'),
@@ -28,6 +30,11 @@ if (!htmlOnly && (!fs.existsSync(pdfPath) || fs.statSync(pdfPath).size < 10_000)
 
 const html = fs.readFileSync(htmlPath, 'utf8');
 const css = fs.readFileSync(cssPath, 'utf8');
+if (!['standalone', 'volume'].includes(buildMode)) fail(`unsupported build mode: ${buildMode}`);
+const hasCover = /id="cover"/iu.test(html);
+const hasChapterToc = /id="table-of-contents"/iu.test(html);
+if (buildMode === 'standalone' && (!hasCover || !hasChapterToc)) fail('standalone mode requires a chapter cover and chapter TOC');
+if (buildMode === 'volume' && (hasCover || hasChapterToc)) fail('volume mode must not contain a chapter cover or chapter TOC');
 const diagrams = [...html.matchAll(/<figure\b[^>]*class="[^"]*diagram-[^"]*"[\s\S]*?<\/figure>/giu)].map((match) => match[0]);
 const svgDiagrams = [...html.matchAll(/<figure\b[^>]*class="[^"]*diagram-svg[^"]*"[\s\S]*?<\/figure>/giu)].map((match) => match[0]);
 const cssDiagrams = [...html.matchAll(/<figure\b[^>]*class="[^"]*diagram-flow[^"]*"[\s\S]*?<\/figure>/giu)].map((match) => match[0]);
@@ -102,7 +109,7 @@ if (!htmlOnly) {
   const pdfText = pdfTextPages.join('\n');
   for (const forbidden of forbiddenReaderMetadata) if (forbidden.pattern.test(pdfText)) fail(`reader metadata leaked into PDF: ${forbidden.label}`);
   if (!/Chapter 02 · Streams, Pipes & Redirection/iu.test(pdfText)) fail('PDF is missing the quiet Chapter 02 footer');
-  if (!/class="toc-page">\d+<\/span>/iu.test(html)) fail('PDF build has no numeric TOC page references');
+  if (buildMode === 'standalone' && !/class="toc-page">\d+<\/span>/iu.test(html)) fail('standalone PDF build has no numeric TOC page references');
 }
 
 const report = {
@@ -110,12 +117,13 @@ const report = {
   sourceFiles: sourceFiles.map((file) => path.relative(path.resolve(volumeRoot, '../..'), file).replaceAll(path.sep, '/')),
   html: path.relative(path.resolve(volumeRoot, '../..'), htmlPath).replaceAll(path.sep, '/'),
   pdf: path.relative(path.resolve(volumeRoot, '../..'), pdfPath).replaceAll(path.sep, '/'),
+  buildMode,
   pdfValidated: !htmlOnly,
   diagrams: { total: diagrams.length, inlineSvg: svgDiagrams.length, deterministicCss: cssDiagrams.length },
   workedExamples: workedExamples.length,
   workedExampleEvidence: evidenceCues,
   readerMetadata: 'absent',
-  tocPagesResolved: !htmlOnly,
+  tocPagesResolved: !htmlOnly && buildMode === 'standalone',
   forbiddenDiagramForms: ['ASCII/text topology', 'spacing-based node/arrow layout', 'ASCII inside <figure>'],
 };
 console.log(JSON.stringify(report, null, 2));

@@ -1,0 +1,37 @@
+name: Fieldbook build validation
+
+on:
+  pull_request:
+    paths:
+      - 'fieldbook/**'
+      - 'docs/BOOK_READER_DESIGN_STANDARD.md'
+      - 'docs/FIELDBOOK_AUTHORING_STANDARD.md'
+
+permissions:
+  contents: read
+
+jobs:
+  fieldbook-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: fieldbook/vol1-linux
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: fieldbook/vol1-linux/package-lock.json
+      - name: Install npm dependencies
+        run: npm ci
+      - name: Install Chromium and Linux dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Check frozen sources
+        run: npm run check:frozen-sources
+      - name: Build Chapter 02
+        run: npm run build:chapter02
+      - name: Check reader quality
+        run: npm run check:reader-quality

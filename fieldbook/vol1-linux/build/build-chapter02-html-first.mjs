@@ -162,6 +162,7 @@ const buildHtml = (pageMap = null) => {
     return `<a class="toc-entry" href="#section-${slugify(heading)}"><span class="toc-label">${escapeHtml(tocText)}</span><span class="toc-page">${pageText}</span></a>`;
   }).join('');
   const cover = buildMode === 'standalone' ? `<section class="cover" id="cover"><div class="cover-kicker">VOLUME 1</div><h1>DevOps Engineering Fieldbook</h1><p class="cover-volume">Linux Systems &amp; Operations</p><p class="cover-subtitle">Streams, Pipes &amp; Redirection</p><div class="cover-rule"></div><p class="cover-audience">A beginner-first lesson in where command input and output travel.</p><p class="cover-meta">BIÊN SOẠN: VÕ TRỌNG PHÚC</p></section>` : '';
+  const chapterToc = buildMode === 'standalone' ? `<section class="toc" id="table-of-contents"><p class="eyebrow">CONTENTS</p><h2>Chapter 02 - Streams, Pipes &amp; Redirection</h2><div class="toc-list">${toc}</div></section>` : '';
   return `<!doctype html>
 <html lang="vi">
 <head>
@@ -174,7 +175,7 @@ const buildHtml = (pageMap = null) => {
   <nav class="screen-nav" aria-label="Book navigation"><span>DevOps Engineering Fieldbook</span><span>Volume 1 - Linux Systems &amp; Operations</span></nav>
   <main class="book-shell">
     ${cover}
-    <section class="toc" id="table-of-contents"><p class="eyebrow">CONTENTS</p><h2>Chapter 02 - Streams, Pipes &amp; Redirection</h2><div class="toc-list">${toc}</div></section>
+    ${chapterToc}
     <section class="chapter-header" id="chapter-02"><p class="eyebrow">CHAPTER 02</p><h1>Streams, Pipes &amp; Redirection</h1><p class="chapter-dek">Follow text as it enters a command, leaves it and becomes evidence.</p></section>
     <article class="chapter-content">${bodyWithWorkedExample}</article>
   </main>
@@ -184,8 +185,25 @@ const buildHtml = (pageMap = null) => {
 };
 
 fs.mkdirSync(outputRoot, { recursive: true });
-fs.writeFileSync(htmlPath, buildHtml());
-execFileSync(process.execPath, [path.join(buildRoot, 'check-reader-quality.mjs'), '--html-only'], { cwd: repoRoot, stdio: 'inherit' });
+const assertBuildMode = (htmlContent) => {
+  const hasCover = /id="cover"/iu.test(htmlContent);
+  const hasChapterToc = /id="table-of-contents"/iu.test(htmlContent);
+  if (buildMode === 'standalone' && (!hasCover || !hasChapterToc)) throw new Error('Standalone mode requires a chapter cover and chapter TOC');
+  if (buildMode === 'volume' && (hasCover || hasChapterToc)) throw new Error('Volume mode must suppress the chapter cover and chapter TOC');
+};
+const writeHtml = (pageMap = null) => {
+  const htmlContent = buildHtml(pageMap);
+  assertBuildMode(htmlContent);
+  fs.writeFileSync(htmlPath, htmlContent);
+};
+const runReaderQuality = (htmlOnly = false) => {
+  const argumentsList = [path.join(buildRoot, 'check-reader-quality.mjs'), `--mode=${buildMode}`];
+  if (htmlOnly) argumentsList.push('--html-only');
+  execFileSync(process.execPath, argumentsList, { cwd: repoRoot, stdio: 'inherit' });
+};
+
+writeHtml();
+runReaderQuality(true);
 
 const intermediatePdf = path.join(outputRoot, '.chapter02-unfooted.pdf');
 const exportPdf = async (targetPath) => {
@@ -222,18 +240,18 @@ const extractPageMap = async (pdfFile) => {
 
 await exportPdf(intermediatePdf);
 let pageMap = await extractPageMap(intermediatePdf);
-fs.writeFileSync(htmlPath, buildHtml(pageMap));
+writeHtml(pageMap);
 await exportPdf(intermediatePdf);
 const verifiedPageMap = await extractPageMap(intermediatePdf);
 if (JSON.stringify(verifiedPageMap) !== JSON.stringify(pageMap)) {
   pageMap = verifiedPageMap;
-  fs.writeFileSync(htmlPath, buildHtml(pageMap));
+  writeHtml(pageMap);
   await exportPdf(intermediatePdf);
   const finalPageMap = await extractPageMap(intermediatePdf);
   if (JSON.stringify(finalPageMap) !== JSON.stringify(pageMap)) throw new Error('TOC page mapping did not stabilize after PDF export');
   pageMap = finalPageMap;
 }
-execFileSync(process.execPath, [path.join(buildRoot, 'check-reader-quality.mjs'), '--html-only'], { cwd: repoRoot, stdio: 'inherit' });
+runReaderQuality(true);
 
 const pdf = await PDFDocument.load(fs.readFileSync(intermediatePdf));
 const font = await pdf.embedFont(StandardFonts.Helvetica);
@@ -246,7 +264,7 @@ pdf.getPages().forEach((pdfPage, index) => {
 });
 fs.writeFileSync(pdfPath, await pdf.save());
 fs.rmSync(intermediatePdf, { force: true });
-execFileSync(process.execPath, [path.join(buildRoot, 'check-reader-quality.mjs')], { cwd: repoRoot, stdio: 'inherit' });
+runReaderQuality();
 execFileSync(process.execPath, [path.join(volumeRoot, 'check-frozen-sources.mjs')], { cwd: repoRoot, stdio: 'inherit' });
 
 const repoRelative = (file) => path.relative(repoRoot, file).replaceAll(path.sep, '/');
@@ -262,8 +280,8 @@ const report = {
   frozenSources: 'FROZEN_SOURCES_OK',
   readerMetadata: 'absent',
   workedExamplePlacement: 'after section 2.10 and before section 2.11',
-  tocPagesResolved: true,
-  tocPageMap: pageMap,
+  tocPagesResolved: buildMode === 'standalone',
+  tocPageMap: buildMode === 'standalone' ? pageMap : {},
   footer: 'Chapter 02 · Streams, Pipes & Redirection + physical page number; no total-page metadata',
   visualQa: 'Inspect generated HTML, a diagram-heavy PDF page, and an example/lab-heavy PDF page before publication.',
 };
